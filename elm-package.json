@@ -4,12 +4,14 @@
     "repository": "https://github.com/akeeton/nickel-havana.git",
     "license": "BSD2",
     "source-directories": [
-        "."
+        "src",
+        "elmfire/src"
     ],
     "exposed-modules": [],
     "dependencies": {
         "elm-lang/core": "2.0.1 <= v < 3.0.0",
         "evancz/elm-html": "3.0.0 <= v < 4.0.0"
     },
+    "native-modules": true,
     "elm-version": "0.15.0 <= v < 0.16.0"
 }

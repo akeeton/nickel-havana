@@ -1,5 +1,7 @@
 module Main where
 
+import ElmFire exposing (..)
+import ElmFire.Auth as Auth
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
 import Html.Events exposing (onClick)
@@ -13,7 +15,7 @@ videos = List.map Youtube ["vR5HJp_xXRs", "RwpjyLUj0XU"]
 toHtml : Maybe Source -> Html
 toHtml maybeSource =
   case maybeSource of
-    Nothing         -> iframe [] []
+    Nothing                -> iframe [] []
     Just (Youtube videoId) ->
       let
         srcUrl = "https://www.youtube.com/embed/" ++ videoId ++ "?autoplay=1&controls=0&disablekb=1&enablejsapi=1&fs=0&rel=0&iv_load_policy=3"
