@@ -10,12 +10,15 @@ import Html.Events exposing (onClick)
 -- MODEL
 
 type Source = Youtube String
-videos = List.map Youtube ["vR5HJp_xXRs", "RwpjyLUj0XU"]
+videos =
+    List.map Youtube ["vR5HJp_xXRs", "RwpjyLUj0XU"]
+
 
 toHtml : Maybe Source -> Html
 toHtml maybeSource =
   case maybeSource of
-    Nothing                -> iframe [] []
+    Nothing -> iframe [] []
+
     Just (Youtube videoId) ->
       let
         srcUrl = "https://www.youtube.com/embed/" ++ videoId ++ "?autoplay=1&controls=0&disablekb=1&enablejsapi=1&fs=0&rel=0&iv_load_policy=3"
@@ -29,19 +32,22 @@ toHtml maybeSource =
           , style [("border", "0")]
           ] []
 
-type alias Model = List Source
+
+type alias Model =
+    List Source
 
 
 -- UPDATE
 
 type Action = Start | Next | Stop
 
+
 update : Action -> Model -> Model
 update action model =
   case action of
     Start -> model
-    Next  -> Maybe.withDefault [] <| List.tail model
-    Stop  -> []
+    Next -> Maybe.withDefault [] <| List.tail model
+    Stop -> []
 
 
 -- VIEW
