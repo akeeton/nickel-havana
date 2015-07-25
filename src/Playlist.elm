@@ -1,4 +1,7 @@
-module Playlist where
+module Playlist
+    ( Playlist
+    )
+    where
 
 import Json.Decode as JD
 import Json.Decode exposing ((:=))

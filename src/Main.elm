@@ -6,28 +6,43 @@ import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
 import Html.Events exposing (onClick)
 
+import Playlist exposing (Playlist)
+import Player exposing (Player, NullPlayer)
+
 
 -- MODEL
 
-type alias Model =
-    Int
+type alias Model a =
+    { playlists : List Playlist
+    , playing : Player a
+    }
+
+
+initialModel : Model {}
+initialModel =
+    { playlists = []
+    , playing = Player.initNullPlayer
+    }
 
 
 -- UPDATE
 type Action
-    = Nop
+    = LoadPlaylist
+    --| ChangePlaying(Player a)
+    | DoNothing
 
 
-update : Action -> Model -> Model
+update : Action -> Model a -> Model a
 update action model =
     model
 
 
 -- VIEW
 
-view : Signal.Address Action -> Model -> Html
+view : Signal.Address Action -> Model a -> Html
 view address model =
   div [] []
+
 
 countStyle : Attribute
 countStyle =
@@ -47,11 +62,11 @@ main =
   Signal.map (view actions.address) model
 
 
-model : Signal Model
+model : Signal (Model {})
 model =
-  Signal.foldp update 0 actions.signal
+  Signal.foldp update initialModel actions.signal
 
 
-actions : Signal.Mailbox Action
+actions : Signal.Mailbox (Action)
 actions =
-  Signal.mailbox Nop
+  Signal.mailbox DoNothing
