@@ -1,10 +1,7 @@
-module Playlist
-    ( PlaylistEntry(..)
-    , Playlist(..)
-    , init
-    ) where
+module Playlist where
 
 import Json.Decode as JD
+import Json.Decode exposing ((:=))
 
 
 type alias PlaylistEntry =
@@ -16,10 +13,17 @@ type alias PlaylistEntry =
 
 
 type alias Playlist =
-    [PlaylistEntry]
+    List PlaylistEntry
 
 
 playlistEntryDecoder : JD.Decoder PlaylistEntry
+playlistEntryDecoder =
+    JD.object4
+        PlaylistEntry
+        ("title" := JD.string)
+        ("url" := JD.string)
+        ("startTime" := JD.string)
+        ("endTime" := JD.string)
 
 
 playlistDecoder : JD.Decoder Playlist
@@ -27,5 +31,5 @@ playlistDecoder =
     JD.list playlistEntryDecoder
 
 
-init : String -> Result String Playlist
-init =
+initWithJson : String -> Result String Playlist
+initWithJson = JD.decodeString playlistDecoder
