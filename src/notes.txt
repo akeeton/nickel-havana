@@ -3,10 +3,12 @@ button that loads json playlist from file
 playlist format:
 {
     [
-        "title": "string",
-        "url": "string",
-        "startTime": "string",
-        "endTime": "string",
+        {
+            "title": "string",
+            "url": "string",
+            "startTime": "string",
+            "endTime": "string",
+        }
     ]
 }
 
