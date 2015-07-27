@@ -41,32 +41,32 @@ update action model =
 
 view : Signal.Address Action -> Model a -> Html
 view address model =
-  div [] []
+    div [] []
 
 
 countStyle : Attribute
 countStyle =
-  style
-    [ ("font-size", "20px")
-    , ("font-family", "monospace")
-    , ("display", "inline-block")
-    , ("width", "50px")
-    , ("text-align", "center")
-    ]
+    style
+        [ ("font-size", "20px")
+        , ("font-family", "monospace")
+        , ("display", "inline-block")
+        , ("width", "50px")
+        , ("text-align", "center")
+        ]
 
 
 -- SIGNALS
 
 main : Signal Html
 main =
-  Signal.map (view actions.address) model
+    Signal.map (view actions.address) model
 
 
 model : Signal (Model {})
 model =
-  Signal.foldp update initialModel actions.signal
+    Signal.foldp update initialModel actions.signal
 
 
 actions : Signal.Mailbox (Action)
 actions =
-  Signal.mailbox DoNothing
+    Signal.mailbox DoNothing
