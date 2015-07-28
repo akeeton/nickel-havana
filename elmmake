@@ -1,2 +1,2 @@
 #!/bin/bash
-elm make src/Main.elm src/Player.elm src/Playlist.elm
+elm make src/Main.elm --warn --output=index.html
