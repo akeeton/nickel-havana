@@ -4,7 +4,7 @@ module Main where
 --import ElmFire.Auth as Auth
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, on, targetValue)
 
 import Playlist exposing (Playlist)
 import Player exposing (Player, NullPlayer)
@@ -15,6 +15,7 @@ import Player exposing (Player, NullPlayer)
 type alias Model a =
     { playlists : List Playlist
     , playing : Player a
+    , importTextArea : String
     }
 
 
@@ -22,26 +23,59 @@ initialModel : Model {}
 initialModel =
     { playlists = []
     , playing = Player.initNullPlayer
+    , importTextArea = ""
     }
 
 
 -- UPDATE
 type Action
-    = LoadPlaylist
-    --| ChangePlaying(Player a)
+    = ImportPlaylist
+    | UpdateImportTextArea (String)
+    --| ChangePlaying (Player a)
     | DoNothing
 
 
 update : Action -> Model a -> Model a
 update action model =
-    model
+    case action of
+        UpdateImportTextArea text ->
+            { model | importTextArea <- text }
+
+        otherwise ->
+            model
 
 
 -- VIEW
 
 view : Signal.Address Action -> Model a -> Html
 view address model =
-    div [] []
+    let
+        importedPlaylistString =
+            model.importTextArea
+            |> Playlist.initWithJson
+            |> Result.toMaybe
+            |> Maybe.withDefault []
+            |> Playlist.playlistToString
+    in
+        div []
+            [ textarea
+                [ on "input" targetValue handleImportTextAreaInput
+                ]
+                []
+            , div
+                []
+                [ text importedPlaylistString
+                ]
+            , button
+                [ onClick address ImportPlaylist ]
+                [ text "Import playlist" ]
+            ]
+
+
+handleImportTextAreaInput : String -> Signal.Message
+handleImportTextAreaInput text =
+    UpdateImportTextArea text
+    |> Signal.message actions.address
 
 
 countStyle : Attribute

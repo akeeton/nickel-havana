@@ -1,10 +1,14 @@
 module Playlist
     ( Playlist
+    , initWithJson
+    , playlistToString
     )
     where
 
 import Json.Decode as JD
 import Json.Decode exposing ((:=))
+import List
+import String
 
 
 type alias PlaylistEntry =
@@ -17,6 +21,21 @@ type alias PlaylistEntry =
 
 type alias Playlist =
     List PlaylistEntry
+
+
+playlistEntryToString : PlaylistEntry -> String
+playlistEntryToString entry =
+    String.join "\n"
+        [ entry.title
+        , entry.url
+        , entry.startTime
+        , entry.endTime
+        ]
+
+
+playlistToString : Playlist -> String
+playlistToString playlist =
+    String.concat <| List.map playlistEntryToString playlist
 
 
 playlistEntryDecoder : JD.Decoder PlaylistEntry
