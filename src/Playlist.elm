@@ -50,7 +50,7 @@ playlistEntryDecoder =
 
 playlistDecoder : JD.Decoder Playlist
 playlistDecoder =
-    JD.list playlistEntryDecoder
+    JD.object1 (\x -> x) ("playlist" := JD.list playlistEntryDecoder)
 
 
 initWithJson : String -> Result String Playlist

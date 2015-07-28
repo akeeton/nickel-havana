@@ -50,12 +50,14 @@ update action model =
 view : Signal.Address Action -> Model a -> Html
 view address model =
     let
-        importedPlaylistString =
-            model.importTextArea
-            |> Playlist.initWithJson
-            |> Result.toMaybe
-            |> Maybe.withDefault []
-            |> Playlist.playlistToString
+        resImportedPlaylist = Playlist.initWithJson model.importTextArea
+
+        importedPlaylistString = case resImportedPlaylist of
+            Ok importedPlaylist ->
+                Playlist.playlistToString importedPlaylist
+
+            Err message ->
+                message
     in
         div []
             [ textarea
