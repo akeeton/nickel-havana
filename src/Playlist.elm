@@ -1,14 +1,14 @@
 module Playlist
     ( Playlist
     , initWithJson
-    , playlistToString
+    , playlistToHtml
     )
     where
 
+import Html exposing (..)
 import Json.Decode as JD
 import Json.Decode exposing ((:=))
 import List
-import String
 
 
 type alias PlaylistEntry =
@@ -23,19 +23,21 @@ type alias Playlist =
     List PlaylistEntry
 
 
-playlistEntryToString : PlaylistEntry -> String
-playlistEntryToString entry =
-    String.join "\n"
-        [ entry.title
-        , entry.url
-        , entry.startTime
-        , entry.endTime
+playlistEntryToHtml : PlaylistEntry -> Html
+playlistEntryToHtml entry =
+    div []
+        [ p [] [ text entry.title ]
+        , p [] [ text entry.url ]
+        , p [] [ text entry.startTime ]
+        , p [] [ text entry.endTime ]
         ]
 
 
-playlistToString : Playlist -> String
-playlistToString playlist =
-    String.concat <| List.map playlistEntryToString playlist
+playlistToHtml : Playlist -> Html
+playlistToHtml playlist =
+    List.map playlistEntryToHtml playlist
+    |> List.intersperse (hr [] [])
+    |> div []
 
 
 playlistEntryDecoder : JD.Decoder PlaylistEntry

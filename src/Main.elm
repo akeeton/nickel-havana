@@ -52,22 +52,27 @@ view address model =
     let
         resImportedPlaylist = Playlist.initWithJson model.importTextArea
 
-        importedPlaylistString = case resImportedPlaylist of
+        importedPlaylistHtml = case resImportedPlaylist of
             Ok importedPlaylist ->
-                Playlist.playlistToString importedPlaylist
+                Playlist.playlistToHtml importedPlaylist
 
             Err message ->
-                message
+                text message
+
+        textAreaStyle = style
+            [ ("width", "400px")
+            , ("height", "300px")
+            ]
     in
         div []
             [ textarea
                 [ on "input" targetValue handleImportTextAreaInput
+                , textAreaStyle
                 ]
                 []
             , div
                 []
-                [ text importedPlaylistString
-                ]
+                [ importedPlaylistHtml ]
             , button
                 [ onClick address ImportPlaylist ]
                 [ text "Import playlist" ]
