@@ -36,7 +36,7 @@ playlistEntryToHtml entry =
 playlistToHtml : Playlist -> Html
 playlistToHtml playlist =
     List.map playlistEntryToHtml playlist
-    |> List.intersperse (hr [] [])
+    |> List.intersperse (p [] [ text "----" ])
     |> div []
 
 

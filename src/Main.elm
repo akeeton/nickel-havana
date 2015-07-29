@@ -64,18 +64,32 @@ view address model =
             , ("height", "300px")
             ]
     in
-        div []
-            [ textarea
-                [ on "input" targetValue handleImportTextAreaInput
-                , textAreaStyle
+        div
+            [ id "site" ]
+            [ div
+                [ id "playlist-import" ]
+                [ h1
+                    []
+                    [ text "Playlist Import" ]
+                , textarea
+                    [ on "input" targetValue handleImportTextAreaInput
+                    , textAreaStyle
+                    ]
+                    []
+                , div
+                    [ id "playlist-preview" ]
+                    [ importedPlaylistHtml ]
+                , button
+                    [ onClick address ImportPlaylist ]
+                    [ text "Import playlist" ]
                 ]
-                []
+                , h1
+                    []
+                    [ text "Playlists" ]
             , div
-                []
-                [ importedPlaylistHtml ]
-            , button
-                [ onClick address ImportPlaylist ]
-                [ text "Import playlist" ]
+                [ id "playlists" ]
+                [
+                ]
             ]
 
 
