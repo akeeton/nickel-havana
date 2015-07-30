@@ -1,5 +1,6 @@
 module Playlist
     ( Playlist
+    , Action
     , init
     , view
     )
@@ -18,11 +19,23 @@ type alias Playlist =
     }
 
 
-view : Playlist -> Html
-view playlist =
+type Action
+    = SongAction Int Song.Action
+    | DoNothing
+
+
+songNToHtml : Signal.Address Action -> Int -> Song -> Html
+songNToHtml address n song =
+    let
+        forwardingAddress = Signal.forwardTo address <| SongAction n
+    in
+        Song.view forwardingAddress song
+
+view : Signal.Address Action -> Playlist -> Html
+view address playlist =
     let
         headerHtml = h2 [] [ text playlist.name ]
-        songsHtmls = List.map Song.view playlist.songs
+        songsHtmls = List.indexedMap (songNToHtml address) playlist.songs
     in
         div [] (headerHtml :: songsHtmls)
 

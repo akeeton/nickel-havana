@@ -29,9 +29,11 @@ initialModel =
 
 -- UPDATE
 type Action
-    = ImportPlaylist (Playlist)
-    | UpdateImportTextArea (String)
-    --| ChangePlaying (Player a)
+    = ImportPlaylist Playlist
+    | UpdateImportTextArea String
+    --| ChangePlaying Player a
+    -- | SongAction Song.Action
+    | PlaylistAction Playlist.Action
     | DoNothing
 
 
@@ -52,13 +54,15 @@ update action model =
 view : Signal.Address Action -> Model a -> Html
 view address model =
     let
+        forwardingAddress = Signal.forwardTo address PlaylistAction
+
         resImportedPlaylist = Playlist.init model.importTextArea
 
         (importPlaylistAction, importedPlaylistHtml) =
             case resImportedPlaylist of
                 Ok importedPlaylist ->
                     ( ImportPlaylist importedPlaylist
-                    , Playlist.view importedPlaylist
+                    , Playlist.view forwardingAddress importedPlaylist
                     )
 
                 Err message ->
@@ -69,7 +73,8 @@ view address model =
             , ("height", "300px")
             ]
 
-        playlistDisplay = List.map Playlist.view model.playlists
+        playlistDisplay =
+            List.map (Playlist.view forwardingAddress) model.playlists
     in
         div
             [ id "site" ]
@@ -87,7 +92,7 @@ view address model =
                     [ id "playlist-preview" ]
                     [ importedPlaylistHtml ]
                 , button
-                    [ onClick address <| importPlaylistAction ]
+                    [ onClick address importPlaylistAction ]
                     [ text "Import playlist" ]
                 ]
                 , h1
