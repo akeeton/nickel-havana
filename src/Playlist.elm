@@ -26,7 +26,7 @@ type alias Playlist =
 playlistEntryToHtml : PlaylistEntry -> Html
 playlistEntryToHtml entry =
     div []
-        [ p [] [ text entry.title ]
+        [ h2 [] [ text entry.title ]
         , p [] [ text entry.url ]
         , p [] [ text entry.startTime ]
         , p [] [ text entry.endTime ]

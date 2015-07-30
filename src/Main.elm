@@ -29,7 +29,7 @@ initialModel =
 
 -- UPDATE
 type Action
-    = ImportPlaylist
+    = ImportPlaylist (Playlist)
     | UpdateImportTextArea (String)
     --| ChangePlaying (Player a)
     | DoNothing
@@ -38,6 +38,8 @@ type Action
 update : Action -> Model a -> Model a
 update action model =
     case action of
+        ImportPlaylist playlist ->
+            { model | playlists <- playlist :: model.playlists }
         UpdateImportTextArea text ->
             { model | importTextArea <- text }
 
@@ -52,17 +54,22 @@ view address model =
     let
         resImportedPlaylist = Playlist.initWithJson model.importTextArea
 
-        importedPlaylistHtml = case resImportedPlaylist of
-            Ok importedPlaylist ->
-                Playlist.playlistToHtml importedPlaylist
+        (importPlaylistAction, importedPlaylistHtml) =
+            case resImportedPlaylist of
+                Ok importedPlaylist ->
+                    ( ImportPlaylist importedPlaylist
+                    , Playlist.playlistToHtml importedPlaylist
+                    )
 
-            Err message ->
-                text message
+                Err message ->
+                    (DoNothing, text message)
 
         textAreaStyle = style
             [ ("width", "400px")
             , ("height", "300px")
             ]
+
+        playlistDisplay = List.map Playlist.playlistToHtml model.playlists
     in
         div
             [ id "site" ]
@@ -80,7 +87,7 @@ view address model =
                     [ id "playlist-preview" ]
                     [ importedPlaylistHtml ]
                 , button
-                    [ onClick address ImportPlaylist ]
+                    [ onClick address <| importPlaylistAction ]
                     [ text "Import playlist" ]
                 ]
                 , h1
@@ -88,7 +95,9 @@ view address model =
                     [ text "Playlists" ]
             , div
                 [ id "playlists" ]
-                [
+                [ div
+                    [ id "playlist-display" ]
+                    playlistDisplay
                 ]
             ]
 
