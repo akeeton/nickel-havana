@@ -9,30 +9,13 @@ import Html exposing (..)
 import Json.Decode as JD
 import Json.Decode exposing ((:=))
 import List
-
-
-type alias Song =
-    { title : String
-    , url : String
-    , startTime : String
-    , endTime : String
-    }
+import Song exposing (Song, songToHtml, songDecoder)
 
 
 type alias Playlist =
     { name: String
     , songs: List Song
     }
-
-
-songToHtml : Song -> Html
-songToHtml entry =
-    div []
-        [ h3 [] [ text entry.title ]
-        , p [] [ text entry.url ]
-        , p [] [ text entry.startTime ]
-        , p [] [ text entry.endTime ]
-        ]
 
 
 playlistToHtml : Playlist -> Html
@@ -42,16 +25,6 @@ playlistToHtml playlist =
         songsHtmls = List.map songToHtml playlist.songs
     in
         div [] (headerHtml :: songsHtmls)
-
-
-songDecoder : JD.Decoder Song
-songDecoder =
-    JD.object4
-        Song
-        ("title" := JD.string)
-        ("url" := JD.string)
-        ("startTime" := JD.string)
-        ("endTime" := JD.string)
 
 
 playlistDecoder : JD.Decoder Playlist
