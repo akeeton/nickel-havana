@@ -25,8 +25,8 @@ type alias Playlist =
     }
 
 
-playlistEntryToHtml : Song -> Html
-playlistEntryToHtml entry =
+songToHtml : Song -> Html
+songToHtml entry =
     div []
         [ h3 [] [ text entry.title ]
         , p [] [ text entry.url ]
@@ -39,13 +39,13 @@ playlistToHtml : Playlist -> Html
 playlistToHtml playlist =
     let
         headerHtml = h2 [] [ text playlist.name ]
-        songsHtmls = List.map playlistEntryToHtml playlist.songs
+        songsHtmls = List.map songToHtml playlist.songs
     in
         div [] (headerHtml :: songsHtmls)
 
 
-playlistEntryDecoder : JD.Decoder Song
-playlistEntryDecoder =
+songDecoder : JD.Decoder Song
+songDecoder =
     JD.object4
         Song
         ("title" := JD.string)
@@ -59,7 +59,7 @@ playlistDecoder =
     JD.object2
         (\name songs -> { name = name, songs = songs })
         ("name" := JD.string)
-        ("songs" := JD.list playlistEntryDecoder)
+        ("songs" := JD.list songDecoder)
 
 
 initWithJson : String -> Result String Playlist
