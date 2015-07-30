@@ -1,7 +1,7 @@
 module Song
     ( Song
-    , songToHtml
-    , songDecoder
+    , view
+    , decoder
     )
     where
 
@@ -19,23 +19,22 @@ type alias Song =
     }
 
 
-songToHtml : Song -> Html
-songToHtml entry =
+view : Song -> Html
+view song =
     div []
-        [ h3 [] [ text entry.title ]
-        , p [] [ text entry.url ]
-        , p [] [ text entry.startTime ]
-        , p [] [ text entry.endTime ]
+        [ h3 [] [ text song.title ]
+        , p [] [ text song.url ]
+        , p [] [ text song.startTime ]
+        , p [] [ text song.endTime ]
         ]
 
 
-songDecoder : JD.Decoder Song
-songDecoder =
+decoder : JD.Decoder Song
+decoder =
     JD.object4
         Song
         ("title" := JD.string)
         ("url" := JD.string)
         ("startTime" := JD.string)
         ("endTime" := JD.string)
-
 

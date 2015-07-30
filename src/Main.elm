@@ -52,13 +52,13 @@ update action model =
 view : Signal.Address Action -> Model a -> Html
 view address model =
     let
-        resImportedPlaylist = Playlist.initWithJson model.importTextArea
+        resImportedPlaylist = Playlist.init model.importTextArea
 
         (importPlaylistAction, importedPlaylistHtml) =
             case resImportedPlaylist of
                 Ok importedPlaylist ->
                     ( ImportPlaylist importedPlaylist
-                    , Playlist.playlistToHtml importedPlaylist
+                    , Playlist.view importedPlaylist
                     )
 
                 Err message ->
@@ -69,7 +69,7 @@ view address model =
             , ("height", "300px")
             ]
 
-        playlistDisplay = List.map Playlist.playlistToHtml model.playlists
+        playlistDisplay = List.map Playlist.view model.playlists
     in
         div
             [ id "site" ]

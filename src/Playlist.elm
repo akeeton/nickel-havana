@@ -1,7 +1,7 @@
 module Playlist
     ( Playlist
-    , initWithJson
-    , playlistToHtml
+    , init
+    , view
     )
     where
 
@@ -9,7 +9,7 @@ import Html exposing (..)
 import Json.Decode as JD
 import Json.Decode exposing ((:=))
 import List
-import Song exposing (Song, songToHtml, songDecoder)
+import Song exposing (Song)
 
 
 type alias Playlist =
@@ -18,28 +18,26 @@ type alias Playlist =
     }
 
 
-playlistToHtml : Playlist -> Html
-playlistToHtml playlist =
+view : Playlist -> Html
+view playlist =
     let
         headerHtml = h2 [] [ text playlist.name ]
-        songsHtmls = List.map songToHtml playlist.songs
+        songsHtmls = List.map Song.view playlist.songs
     in
         div [] (headerHtml :: songsHtmls)
 
 
-playlistDecoder : JD.Decoder Playlist
-playlistDecoder =
+decoder : JD.Decoder Playlist
+decoder =
     JD.object2
         (\name songs -> { name = name, songs = songs })
         ("name" := JD.string)
-        ("songs" := JD.list songDecoder)
+        ("songs" := JD.list Song.decoder)
 
 
-initWithJson : String -> Result String Playlist
-initWithJson = JD.decodeString playlistDecoder
+init : String -> Result String Playlist
+init = JD.decodeString decoder
 {-
-type Source = Youtube String
-videos =
     List.map Youtube ["vR5HJp_xXRs", "RwpjyLUj0XU"]
 
 
