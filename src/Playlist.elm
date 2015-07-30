@@ -11,7 +11,7 @@ import Json.Decode exposing ((:=))
 import List
 
 
-type alias PlaylistEntry =
+type alias Song =
     { title : String
     , url : String
     , startTime : String
@@ -20,13 +20,15 @@ type alias PlaylistEntry =
 
 
 type alias Playlist =
-    List PlaylistEntry
+    { name: String
+    , songs: List Song
+    }
 
 
-playlistEntryToHtml : PlaylistEntry -> Html
+playlistEntryToHtml : Song -> Html
 playlistEntryToHtml entry =
     div []
-        [ h2 [] [ text entry.title ]
+        [ h3 [] [ text entry.title ]
         , p [] [ text entry.url ]
         , p [] [ text entry.startTime ]
         , p [] [ text entry.endTime ]
@@ -35,15 +37,17 @@ playlistEntryToHtml entry =
 
 playlistToHtml : Playlist -> Html
 playlistToHtml playlist =
-    List.map playlistEntryToHtml playlist
-    |> List.intersperse (p [] [ text "----" ])
-    |> div []
+    let
+        headerHtml = h2 [] [ text playlist.name ]
+        songsHtmls = List.map playlistEntryToHtml playlist.songs
+    in
+        div [] (headerHtml :: songsHtmls)
 
 
-playlistEntryDecoder : JD.Decoder PlaylistEntry
+playlistEntryDecoder : JD.Decoder Song
 playlistEntryDecoder =
     JD.object4
-        PlaylistEntry
+        Song
         ("title" := JD.string)
         ("url" := JD.string)
         ("startTime" := JD.string)
@@ -52,7 +56,10 @@ playlistEntryDecoder =
 
 playlistDecoder : JD.Decoder Playlist
 playlistDecoder =
-    JD.object1 (\x -> x) ("playlist" := JD.list playlistEntryDecoder)
+    JD.object2
+        (\name songs -> { name = name, songs = songs })
+        ("name" := JD.string)
+        ("songs" := JD.list playlistEntryDecoder)
 
 
 initWithJson : String -> Result String Playlist

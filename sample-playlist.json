@@ -1,16 +1,17 @@
 {
-    "playlist":
+    "name": "Playlist name",
+    "songs":
         [
             {
                 "title": "Song 1",
-                "url": "http://google.com",
+                "url": "http://url1.example.com",
                 "startTime": "",
                 "endTime": ""
             },
 
             {
                 "title": "Song 2",
-                "url": "http://bing.com",
+                "url": "http://url2.example.com",
                 "startTime": "1m",
                 "endTime": "4m30s"
             }
