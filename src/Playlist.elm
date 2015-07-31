@@ -7,6 +7,7 @@ module Playlist
     where
 
 import Html exposing (..)
+import Html.Events exposing (onClick)
 import Json.Decode as JD
 import Json.Decode exposing ((:=))
 import List
@@ -19,17 +20,52 @@ type alias Playlist =
     }
 
 
+type SongDestination
+    = Up
+    | Down
+    | Top
+    | Bottom
+
+
 type Action
-    = SongAction Int Song.Action
+    = MoveSong Int SongDestination
     | DoNothing
+
+
+songDestinationToString : SongDestination -> String
+songDestinationToString destination =
+    case destination of
+        Up ->
+            "Up"
+
+        Down ->
+            "Down"
+
+        Top ->
+            "Top"
+
+        Bottom ->
+            "Bottom"
 
 
 songNToHtml : Signal.Address Action -> Int -> Song -> Html
 songNToHtml address n song =
     let
-        forwardingAddress = Signal.forwardTo address <| SongAction n
+        makeMoveButton : SongDestination -> Html
+        makeMoveButton destination =
+            button
+                [ onClick address <| MoveSong n destination ]
+                [ text <| songDestinationToString destination ]
     in
-        Song.view forwardingAddress song
+        div
+            []
+            [ makeMoveButton Up
+            , makeMoveButton Down
+            , makeMoveButton Top
+            , makeMoveButton Bottom
+            , Song.view song
+            ]
+
 
 view : Signal.Address Action -> Playlist -> Html
 view address playlist =
