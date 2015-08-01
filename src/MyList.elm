@@ -1,5 +1,6 @@
 module MyList
-    (
+    ( getAt
+    , removeAt
     )
     where
 
@@ -9,10 +10,10 @@ getAt list index =
     List.head <| List.drop index list
 
 
-removeAt : List a -> Int -> Maybe a
+removeAt : List a -> Int -> Maybe (List a)
 removeAt list index =
-    if index < length list then
-        Maybe.Just <| (take index list) ++ (drop (index + 1) list)
+    if index < List.length list then
+        Maybe.Just <| List.take index list ++ List.drop (index + 1) list
     else
         Nothing
 

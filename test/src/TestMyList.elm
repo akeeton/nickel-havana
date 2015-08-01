@@ -1,4 +1,4 @@
-module Main where
+module TestMyList where
 
 import Basics exposing (..)
 import Signal exposing (..)
@@ -11,14 +11,16 @@ import IO.IO exposing (..)
 import IO.Runner exposing (Request, Response)
 import IO.Runner as Run
 
-import String
+import MyList
 
 
 tests : Test
-tests = suite "A Test Suite"
-        [ test "Addition" (assertEqual (3 + 7) 10)
-        , test "String.left" (assertEqual "a" (String.left 1 "abcdefg"))
-        , test "This test should fail" (assert False)
+tests =
+    let
+        inputList = [0, 1, 2, 3, 4, 5]
+    in
+    suite "MyList Tests"
+        [ defaultTest <| MyList.getAt inputList 0 `assertEqual` Just 0
         ]
 
 
