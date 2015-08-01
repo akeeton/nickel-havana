@@ -17,10 +17,15 @@ import MyList
 tests : Test
 tests =
     let
-        inputList = [0, 1, 2, 3, 4, 5]
+        zeroToFive = [0, 1, 2, 3, 4, 5]
     in
     suite "MyList Tests"
-        [ defaultTest <| MyList.getAt inputList 0 `assertEqual` Just 0
+        [ defaultTest <| MyList.getAt zeroToFive 0 `assertEqual` Just 0
+        {-, defaultTest <| MyList.getAt zeroToFive 5 `assertEqual` Just 5
+        , defaultTest <| MyList.getAt zeroToFive -1 `assertEqual` Nothing
+        , defaultTest <| MyList.getAt zeroToFive 6 `assertEqual` Nothing
+        , defaultTest <| MyList.getAt [] 0 `assertEqual` Nothing
+        -}
         ]
 
 
