@@ -4,6 +4,7 @@
 elm-stuff
 elm.js
 main.html
+Test*.html
 
 #################
 ## Eclipse
@@ -221,4 +222,3 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-index.html
