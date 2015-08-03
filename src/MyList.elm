@@ -13,12 +13,12 @@ getAt list index =
         List.head <| List.drop index list
 
 
-removeAt : List a -> Int -> Maybe (List a)
+removeAt : List Int -> Int -> List Int
 removeAt list index =
-    if index < List.length list then
-        Maybe.Just <| List.take index list ++ List.drop (index + 1) list
+    if 0 <= index && index < List.length list then
+        List.take index list ++ List.drop (index + 1) list
     else
-        Nothing
+        list
 
 
 {-

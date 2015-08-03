@@ -26,11 +26,11 @@ tests =
             ]
 
         removeAtTests = List.map defaultTest
-            [ Nothing `assertEqual` removeAt zeroToFive -1
-            , Just [1, 2, 3, 4, 5] `assertEqual` removeAt zeroToFive 0
-            , Just [0, 1, 2, 4, 5] `assertEqual` removeAt zeroToFive 3
-            , Just [0, 1, 2, 3, 4] `assertEqual` removeAt zeroToFive 5
-            , Nothing `assertEqual` removeAt zeroToFive 6
+            [ zeroToFive `assertEqual` removeAt zeroToFive -1
+            , [1, 2, 3, 4, 5] `assertEqual` removeAt zeroToFive 0
+            , [0, 2, 3, 4, 5] `assertEqual` removeAt zeroToFive 1
+            , [0, 1, 2, 3, 4] `assertEqual` removeAt zeroToFive 5
+            , zeroToFive `assertEqual` removeAt zeroToFive 6
             ]
     in
         suite "MyList Tests" <| getAtTests ++ removeAtTests
