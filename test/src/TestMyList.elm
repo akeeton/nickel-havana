@@ -17,10 +17,12 @@ tests =
     in
         suite "MyList Tests"
             [ defaultTest <| Just 0 `assertEqual` MyList.getAt zeroToFive 0
+            , defaultTest <| Just 3 `assertEqual` MyList.getAt zeroToFive 3
             , defaultTest <| Just 5 `assertEqual` MyList.getAt zeroToFive 5
             , defaultTest <| Nothing `assertEqual` MyList.getAt zeroToFive -1
             , defaultTest <| Nothing `assertEqual` MyList.getAt zeroToFive 6
             , defaultTest <| Nothing `assertEqual` MyList.getAt [] 0
+            , defaultTest <| Nothing `assertEqual` MyList.getAt [] 5
             ]
 
 
