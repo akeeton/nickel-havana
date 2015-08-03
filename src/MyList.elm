@@ -7,7 +7,10 @@ module MyList
 
 getAt : List a -> Int -> Maybe a
 getAt list index =
-    List.head <| List.drop index list
+    if index < 0 then
+        Nothing
+    else
+        List.head <| List.drop index list
 
 
 removeAt : List a -> Int -> Maybe (List a)
