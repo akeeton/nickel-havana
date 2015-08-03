@@ -7,23 +7,33 @@ import ElmTest.Assertion as A exposing (assertEqual, assert)
 import ElmTest.Runner.String exposing (runDisplay)
 import ElmTest.Test exposing (..)
 
-import MyList
+import MyList exposing(..)
 
 
 tests : Test
 tests =
     let
         zeroToFive = [0, 1, 2, 3, 4, 5]
-    in
-        suite "MyList Tests"
-            [ defaultTest <| Just 0 `assertEqual` MyList.getAt zeroToFive 0
-            , defaultTest <| Just 3 `assertEqual` MyList.getAt zeroToFive 3
-            , defaultTest <| Just 5 `assertEqual` MyList.getAt zeroToFive 5
-            , defaultTest <| Nothing `assertEqual` MyList.getAt zeroToFive -1
-            , defaultTest <| Nothing `assertEqual` MyList.getAt zeroToFive 6
-            , defaultTest <| Nothing `assertEqual` MyList.getAt [] 0
-            , defaultTest <| Nothing `assertEqual` MyList.getAt [] 5
+
+        getAtTests = List.map defaultTest
+            [ Nothing `assertEqual` getAt zeroToFive -1
+            , Just 0 `assertEqual` getAt zeroToFive 0
+            , Just 3 `assertEqual` getAt zeroToFive 3
+            , Just 5 `assertEqual` getAt zeroToFive 5
+            , Nothing `assertEqual` getAt zeroToFive 6
+            , Nothing `assertEqual` getAt [] 0
+            , Nothing `assertEqual` getAt [] 5
             ]
+
+        removeAtTests = List.map defaultTest
+            [ Nothing `assertEqual` removeAt zeroToFive -1
+            , Just [1, 2, 3, 4, 5] `assertEqual` removeAt zeroToFive 0
+            , Just [0, 1, 2, 4, 5] `assertEqual` removeAt zeroToFive 3
+            , Just [0, 1, 2, 3, 4] `assertEqual` removeAt zeroToFive 5
+            , Nothing `assertEqual` removeAt zeroToFive 6
+            ]
+    in
+        suite "MyList Tests" <| getAtTests ++ removeAtTests
 
 
 main : Html
