@@ -1,6 +1,7 @@
 module TestMyList where
 
 import Html exposing (..)
+import String
 
 import ElmTest.Assertion as A exposing (assertEqual, assert)
 import ElmTest.Runner.String exposing (runDisplay)
@@ -16,16 +17,21 @@ tests =
     in
         suite "MyList Tests"
             [ defaultTest <| MyList.getAt zeroToFive 0 `assertEqual` Just 0
-            {-, defaultTest <| MyList.getAt zeroToFive 5 `assertEqual` Just 5
+            , defaultTest <| MyList.getAt zeroToFive 5 `assertEqual` Just 5
             , defaultTest <| MyList.getAt zeroToFive -1 `assertEqual` Nothing
             , defaultTest <| MyList.getAt zeroToFive 6 `assertEqual` Nothing
             , defaultTest <| MyList.getAt [] 0 `assertEqual` Nothing
-            -}
             ]
 
 
 main : Html
-main = p [] [ text <| runDisplay tests ]
+main =
+    let
+        results = runDisplay tests
+        lines = String.split "\n" results
+        htmlLines = List.map (\s -> p [] [ text s ]) lines
+    in
+        div [] htmlLines
 
 {- For node-elm-test
 import Signal exposing (..)
