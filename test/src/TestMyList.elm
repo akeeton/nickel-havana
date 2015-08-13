@@ -23,6 +23,20 @@ getAtTests = List.map defaultTest
     , Nothing `assertEqual` getAt [] 5
     ]
 
+
+insertAtTests = List.map defaultTest
+    [ Nothing `assertEqual` insertAt zeroToFive 9 -1
+    , Just [9, 0, 1, 2, 3, 4, 5] `assertEqual` insertAt zeroToFive 9 0
+    , Just [0, 9, 1, 2, 3, 4, 5] `assertEqual` insertAt zeroToFive 9 1
+    , Just [0, 1, 9, 2, 3, 4, 5] `assertEqual` insertAt zeroToFive 9 2
+    , Just [0, 1, 2, 9, 3, 4, 5] `assertEqual` insertAt zeroToFive 9 3
+    , Just [0, 1, 2, 3, 9, 4, 5] `assertEqual` insertAt zeroToFive 9 4
+    , Just [0, 1, 2, 3, 4, 9, 5] `assertEqual` insertAt zeroToFive 9 5
+    , Just [0, 1, 2, 3, 4, 5, 9] `assertEqual` insertAt zeroToFive 9 6
+    , Nothing `assertEqual` insertAt zeroToFive 9 7
+    ]
+
+
 removeAtTests = List.map defaultTest
     [ zeroToFive `assertEqual` removeAt zeroToFive -1
     , [1, 2, 3, 4, 5] `assertEqual` removeAt zeroToFive 0
@@ -30,6 +44,7 @@ removeAtTests = List.map defaultTest
     , [0, 1, 2, 3, 4] `assertEqual` removeAt zeroToFive 5
     , zeroToFive `assertEqual` removeAt zeroToFive 6
     ]
+
 
 moveTests = List.map defaultTest
     [ Just [1, 2, 3, 4, 5, 0] `assertEqual` move zeroToFive 0 5
@@ -56,6 +71,7 @@ moveTests = List.map defaultTest
     , Nothing `assertEqual` move zeroToFive 3 6
     ]
 
+
 isValidIndexTests = List.map defaultTest
     [ assert <| not (isValidIndex zeroToFive -1)
     , assert <| isValidIndex zeroToFive 0
@@ -73,6 +89,7 @@ tests : Test
 tests =
     suite "MyList Tests" <|
         getAtTests
+        ++ insertAtTests
         ++ removeAtTests
         ++ moveTests
         ++ isValidIndexTests

@@ -1,5 +1,6 @@
 module MyList
     ( getAt
+    , insertAt
     , removeAt
     , move
     , isValidIndex
@@ -15,6 +16,14 @@ getAt list index =
         Nothing
 
 
+insertAt : List a -> a -> Int -> Maybe (List a)
+insertAt list x index =
+    if isValidIndex list index || index == List.length list then
+        Just <| List.take index list ++ x::(List.drop index list)
+    else
+        Nothing
+
+
 removeAt : List Int -> Int -> List Int
 removeAt list index =
     if isValidIndex list index then
@@ -25,6 +34,11 @@ removeAt list index =
 
 move : List a -> Int -> Int -> Maybe (List a)
 move list from to = Nothing
+    -- if isValidIndex list from  && isValidIndex list to then
+    --     if from <= to then
+    --     else
+    -- else
+    --     Nothing
 
 
 isValidIndex : List a -> Int -> Bool
