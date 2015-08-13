@@ -9,15 +9,15 @@ module MyList
 
 getAt : List a -> Int -> Maybe a
 getAt list index =
-    if index < 0 then
-        Nothing
-    else
+    if isValidIndex list index then
         List.head <| List.drop index list
+    else
+        Nothing
 
 
 removeAt : List Int -> Int -> List Int
 removeAt list index =
-    if 0 <= index && index < List.length list then
+    if isValidIndex list index then
         List.take index list ++ List.drop (index + 1) list
     else
         list
