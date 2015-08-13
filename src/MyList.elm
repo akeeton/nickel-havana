@@ -1,6 +1,7 @@
 module MyList
     ( getAt
     , removeAt
+    , move
     )
     where
 
@@ -21,8 +22,6 @@ removeAt list index =
         list
 
 
-{-
 move : List a -> Int -> Int -> Maybe (List a)
-move list from to =
-    -}
+move list from to = Nothing
 

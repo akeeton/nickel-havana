@@ -31,10 +31,35 @@ removeAtTests = List.map defaultTest
     , zeroToFive `assertEqual` removeAt zeroToFive 6
     ]
 
+moveTests = List.map defaultTest
+    [ Just [1, 2, 3, 4, 5, 0] `assertEqual` move zeroToFive 0 5
+    , Just [1, 2, 3, 4, 0, 5] `assertEqual` move zeroToFive 0 4
+    , Just [1, 2, 3, 0, 4, 5] `assertEqual` move zeroToFive 0 3
+    , Just [1, 2, 0, 3, 4, 5] `assertEqual` move zeroToFive 0 2
+    , Just [1, 0, 2, 3, 4, 5] `assertEqual` move zeroToFive 0 1
+    , Just [0, 1, 2, 3, 4, 5] `assertEqual` move zeroToFive 0 0
+    , Just [0, 1, 2, 4, 5, 3] `assertEqual` move zeroToFive 3 5
+    , Just [0, 1, 2, 4, 3, 5] `assertEqual` move zeroToFive 3 4
+    , Just [0, 1, 2, 3, 4, 5] `assertEqual` move zeroToFive 3 3
+    , Just [0, 1, 3, 2, 4, 5] `assertEqual` move zeroToFive 3 2
+    , Just [0, 3, 1, 2, 4, 5] `assertEqual` move zeroToFive 3 1
+    , Just [3, 0, 1, 2, 4, 5] `assertEqual` move zeroToFive 3 0
+    , Just [0, 1, 2, 3, 4, 5] `assertEqual` move zeroToFive 5 5
+    , Just [0, 1, 2, 3, 5, 4] `assertEqual` move zeroToFive 5 4
+    , Just [0, 1, 2, 5, 3, 4] `assertEqual` move zeroToFive 5 3
+    , Just [0, 1, 5, 2, 3, 4] `assertEqual` move zeroToFive 5 2
+    , Just [0, 5, 1, 2, 3, 4] `assertEqual` move zeroToFive 5 1
+    , Just [5, 0, 1, 2, 3, 4] `assertEqual` move zeroToFive 5 0
+    , Nothing `assertEqual` move zeroToFive -1 3
+    , Nothing `assertEqual` move zeroToFive 6 3
+    , Nothing `assertEqual` move zeroToFive 3 -1
+    , Nothing `assertEqual` move zeroToFive 3 6
+    ]
+
 
 tests : Test
 tests =
-    suite "MyList Tests" <| getAtTests ++ removeAtTests
+    suite "MyList Tests" <| getAtTests ++ removeAtTests ++ moveTests
 
 
 main : Html
