@@ -46,21 +46,3 @@ main =
     in
         div [] htmlLines
 
-{- For node-elm-test
-import Signal exposing (..)
-import ElmTest.Run as R
-import ElmTest.Runner.Console exposing (runDisplay)
-import IO.IO exposing (..)
-import IO.Runner exposing (Request, Response)
-import IO.Runner as Run
-
-console : IO ()
-console = runDisplay tests
-
-
-port requests : Signal Request
-port requests = Run.run responses console
-
-
-port responses : Signal Response
--}
