@@ -2,6 +2,7 @@ module MyList
     ( getAt
     , removeAt
     , move
+    , isValidIndex
     )
     where
 
@@ -24,4 +25,9 @@ removeAt list index =
 
 move : List a -> Int -> Int -> Maybe (List a)
 move list from to = Nothing
+
+
+isValidIndex : List a -> Int -> Bool
+isValidIndex list index =
+    index >= 0 && index < List.length list
 

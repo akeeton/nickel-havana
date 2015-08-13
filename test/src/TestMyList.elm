@@ -56,10 +56,26 @@ moveTests = List.map defaultTest
     , Nothing `assertEqual` move zeroToFive 3 6
     ]
 
+isValidIndexTests = List.map defaultTest
+    [ assert <| not (isValidIndex zeroToFive -1)
+    , assert <| isValidIndex zeroToFive 0
+    , assert <| isValidIndex zeroToFive 1
+    , assert <| isValidIndex zeroToFive 2
+    , assert <| isValidIndex zeroToFive 3
+    , assert <| isValidIndex zeroToFive 4
+    , assert <| isValidIndex zeroToFive 5
+    , assert <| not (isValidIndex zeroToFive 6)
+    , assert <| not (isValidIndex [] 0)
+    ]
+
 
 tests : Test
 tests =
-    suite "MyList Tests" <| getAtTests ++ removeAtTests ++ moveTests
+    suite "MyList Tests" <|
+        getAtTests
+        ++ removeAtTests
+        ++ moveTests
+        ++ isValidIndexTests
 
 
 main : Html
