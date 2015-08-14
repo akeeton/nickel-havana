@@ -7,6 +7,8 @@ module MyList
     )
     where
 
+import Maybe exposing (andThen)
+
 
 getAt : Int-> List a -> Maybe a
 getAt index list =
@@ -24,17 +26,26 @@ insertAt x index list =
         Nothing
 
 
-removeAt : Int -> List Int -> List Int
+removeAt : Int -> List a -> Maybe (List a)
 removeAt index list =
     if isValidIndex index list then
-        List.take index list ++ List.drop (index + 1) list
+        Just <| List.take index list ++ List.drop (index + 1) list
     else
-        list
+        Nothing
 
 
 move : Int -> Int -> List a -> Maybe (List a)
-move from to list = Nothing
-    -- removeAt list from `Maybe.andThen` insertAt list to
+move from to list =
+    let
+        (insertCorrection, removeCorrection) =
+            if from <= to then
+                (1, 0)
+            else
+                (0, 1)
+    in
+        getAt from list
+        `andThen` (\x -> insertAt x (to + insertCorrection) list)
+        `andThen` removeAt (from + removeCorrection)
 
 
 isValidIndex : Int -> List a -> Bool
