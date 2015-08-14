@@ -13,7 +13,8 @@ import MyList exposing(..)
 zeroToFive = [0, 1, 2, 3, 4, 5]
 
 
-getAtTests = List.map defaultTest
+getAtTests = 
+    test "getAtTests (ignore 'passed')" (assert True) :: List.map defaultTest
     [ Nothing `assertEqual` getAt -1 zeroToFive
     , Just 0 `assertEqual` getAt 0 zeroToFive
     , Just 3 `assertEqual` getAt 3 zeroToFive
@@ -24,7 +25,8 @@ getAtTests = List.map defaultTest
     ]
 
 
-insertAtTests = List.map defaultTest
+insertAtTests =
+    test "insertAtTests (ignore 'passed')" (assert True) :: List.map defaultTest
     [ Nothing `assertEqual` insertAt 9 -1 zeroToFive
     , Just [9, 0, 1, 2, 3, 4, 5] `assertEqual` insertAt 9 0 zeroToFive
     , Just [0, 9, 1, 2, 3, 4, 5] `assertEqual` insertAt 9 1 zeroToFive
@@ -37,16 +39,18 @@ insertAtTests = List.map defaultTest
     ]
 
 
-removeAtTests = List.map defaultTest
-    [ zeroToFive `assertEqual` removeAt -1 zeroToFive
-    , [1, 2, 3, 4, 5] `assertEqual` removeAt 0 zeroToFive
-    , [0, 2, 3, 4, 5] `assertEqual` removeAt 1 zeroToFive
-    , [0, 1, 2, 3, 4] `assertEqual` removeAt 5 zeroToFive
-    , zeroToFive `assertEqual` removeAt 6 zeroToFive
+removeAtTests =
+    test "removeAtTests (ignore 'passed')" (assert True) :: List.map defaultTest
+    [ Nothing `assertEqual` removeAt -1 zeroToFive
+    , Just [1, 2, 3, 4, 5] `assertEqual` removeAt 0 zeroToFive
+    , Just [0, 2, 3, 4, 5] `assertEqual` removeAt 1 zeroToFive
+    , Just [0, 1, 2, 3, 4] `assertEqual` removeAt 5 zeroToFive
+    , Nothing `assertEqual` removeAt 6 zeroToFive
     ]
 
 
-moveTests = List.map defaultTest
+moveTests =
+    test "moveTests (ignore 'passed')" (assert True) :: List.map defaultTest
     [ Just [1, 2, 3, 4, 5, 0] `assertEqual` move 0 5 zeroToFive
     , Just [1, 2, 3, 4, 0, 5] `assertEqual` move 0 4 zeroToFive
     , Just [1, 2, 3, 0, 4, 5] `assertEqual` move 0 3 zeroToFive
@@ -72,7 +76,8 @@ moveTests = List.map defaultTest
     ]
 
 
-isValidIndexTests = List.map defaultTest
+isValidIndexTests =
+    test "isValidIndexTests (ignore 'passed')" (assert True) :: List.map defaultTest
     [ assert <| not (isValidIndex -1 zeroToFive)
     , assert <| isValidIndex 0 zeroToFive
     , assert <| isValidIndex 1 zeroToFive
