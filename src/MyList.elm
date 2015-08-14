@@ -8,40 +8,36 @@ module MyList
     where
 
 
-getAt : List a -> Int -> Maybe a
-getAt list index =
-    if isValidIndex list index then
+getAt : Int-> List a -> Maybe a
+getAt index list =
+    if isValidIndex index list then
         List.head <| List.drop index list
     else
         Nothing
 
 
-insertAt : List a -> a -> Int -> Maybe (List a)
-insertAt list x index =
-    if isValidIndex list index || index == List.length list then
+insertAt : a -> Int -> List a -> Maybe (List a)
+insertAt x index list =
+    if isValidIndex index list || index == List.length list then
         Just <| List.take index list ++ x::(List.drop index list)
     else
         Nothing
 
 
-removeAt : List Int -> Int -> List Int
-removeAt list index =
-    if isValidIndex list index then
+removeAt : Int -> List Int -> List Int
+removeAt index list =
+    if isValidIndex index list then
         List.take index list ++ List.drop (index + 1) list
     else
         list
 
 
-move : List a -> Int -> Int -> Maybe (List a)
-move list from to = Nothing
-    -- if isValidIndex list from  && isValidIndex list to then
-    --     if from <= to then
-    --     else
-    -- else
-    --     Nothing
+move : Int -> Int -> List a -> Maybe (List a)
+move from to list = Nothing
+    -- removeAt list from `Maybe.andThen` insertAt list to
 
 
-isValidIndex : List a -> Int -> Bool
-isValidIndex list index =
+isValidIndex : Int -> List a -> Bool
+isValidIndex index list =
     index >= 0 && index < List.length list
 
