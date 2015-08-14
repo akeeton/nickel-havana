@@ -2,6 +2,8 @@ module Playlist
     ( Playlist
     , Action
     , init
+    , length
+    , update
     , view
     )
     where
@@ -11,6 +13,8 @@ import Html.Events exposing (onClick)
 import Json.Decode as JD
 import Json.Decode exposing ((:=))
 import List
+
+import MyList
 import Song exposing (Song)
 
 
@@ -30,6 +34,43 @@ type SongDestination
 type Action
     = MoveSong Int SongDestination
     | DoNothing
+
+
+init : String -> Result String Playlist
+init = JD.decodeString decoder
+
+
+length : Playlist -> Int
+length playlist =
+    List.length playlist.songs
+
+
+update : Action -> Playlist -> Playlist
+update action playlist =
+    case action of
+        MoveSong n destination ->
+            let n' =
+                case destination of
+                    Up ->
+                        n - 1
+
+                    Down ->
+                        n + 1
+
+                    Top ->
+                        0
+
+                    Bottom ->
+                        length playlist - 1
+            in
+                case MyList.move n n' playlist.songs of
+                    Just songs' ->
+                        { playlist | songs <- songs' }
+                    Nothing ->
+                        playlist
+
+        DoNothing ->
+            playlist
 
 
 songDestinationToString : SongDestination -> String
@@ -84,8 +125,6 @@ decoder =
         ("songs" := JD.list Song.decoder)
 
 
-init : String -> Result String Playlist
-init = JD.decodeString decoder
 {-
     List.map Youtube ["vR5HJp_xXRs", "RwpjyLUj0XU"]
 

@@ -42,8 +42,24 @@ update action model =
     case action of
         ImportPlaylist playlist ->
             { model | playlists <- playlist :: model.playlists }
+
         UpdateImportTextArea text ->
             { model | importTextArea <- text }
+
+        PlaylistAction playlistAction ->
+            case List.head model.playlists of
+                Just loadedPlaylist ->
+                    let
+                        loadedPlaylist' =
+                            Playlist.update playlistAction loadedPlaylist
+
+                        playlists' =
+                            loadedPlaylist' :: List.drop 1 model.playlists
+                    in
+                        { model | playlists <- playlists' }
+
+                Nothing ->
+                    model
 
         otherwise ->
             model
