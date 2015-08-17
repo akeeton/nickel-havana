@@ -1,18 +1,20 @@
 module Main where
 
+import Debug -- TODO akeeton: Remove
+import Effects exposing (Effects, Never)
 --import ElmFire exposing (..)
 --import ElmFire.Auth as Auth
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
 -- import Html.Events exposing (onClick, on, targetValue)
+import Signal exposing (Address)
+import StartApp exposing (App, start)
+import Task exposing (Task)
 
-import Debug -- TODO akeeton: Remove
 -- import Playlist exposing (Playlist)
 import PlaylistArea exposing (PlaylistArea)
 import Player exposing (Player, NullPlayer)
 
-
--- MODEL
 
 type alias Model a =
     { playlistArea : PlaylistArea
@@ -20,40 +22,45 @@ type alias Model a =
     }
 
 
-initialModel : Model {}
-initialModel =
-    { playlistArea = PlaylistArea.init []
-    , playing = Player.initNullPlayer
-    }
-
-
--- UPDATE
 type Action
     = DoNothing
     | PlaylistAreaAction PlaylistArea.Action
 
 
-update : Action -> Model a -> Model a
+init : (Model {}, Effects Action)
+init =
+    let
+        initialModel : Model {}
+        initialModel =
+            { playlistArea = PlaylistArea.init []
+            , playing = Player.initNullPlayer
+            }
+    in
+        ( initialModel, Effects.none)
+
+
+update : Action -> Model a -> (Model a, Effects Action)
 update action model =
-    case action of
-        DoNothing ->
-            model
+    let
+        model' = case action of
+            DoNothing ->
+                model
 
-        PlaylistAreaAction playlistAreaAction ->
-            let
-                playlistArea' =
-                    PlaylistArea.update playlistAreaAction model.playlistArea
-            in
-                { model | playlistArea <- playlistArea' }
+            PlaylistAreaAction playlistAreaAction ->
+                let
+                    playlistArea' =
+                        PlaylistArea.update playlistAreaAction model.playlistArea
+                in
+                    { model | playlistArea <- playlistArea' }
 
-        otherwise ->
-            -- TODO akeeton: Remove
-            Debug.crash "Main.Action case not implemented in Main.update"
+            otherwise ->
+                -- TODO akeeton: Remove
+                Debug.crash "Main.Action case not implemented in Main.update"
+    in
+        (model', Effects.none)
 
 
--- VIEW
-
-view : Signal.Address Action -> Model a -> Html
+view : Address Action -> Model a -> Html
 view address model =
     let
         forwardingAddress = Signal.forwardTo address PlaylistAreaAction
@@ -64,6 +71,11 @@ view address model =
         div
             [ id "site" ]
             [ playlistAreaHtml ]
+
+
+inputs : List (Signal Action)
+inputs =
+    []
 
 
 countStyle : Attribute
@@ -77,18 +89,16 @@ countStyle =
         ]
 
 
--- SIGNALS
+app : App (Model {})
+app =
+    start { init = init, view = view, update = update, inputs = inputs }
+
 
 main : Signal Html
 main =
-    Signal.map (view actions.address) model
+    app.html
 
 
-model : Signal (Model {})
-model =
-    Signal.foldp update initialModel actions.signal
-
-
-actions : Signal.Mailbox (Action)
-actions =
-    Signal.mailbox DoNothing
+port tasks : Signal (Task Never ())
+port tasks =
+    app.tasks
