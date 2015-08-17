@@ -19,7 +19,7 @@ type alias PlaylistArea =
 
 type Action
     = DoNothing
-    | PlaylistAction (Playlist.Action)
+    | PlaylistAction Int Playlist.Action
 
 
 init : List Playlist -> PlaylistArea
@@ -33,12 +33,29 @@ update action area =
         DoNothing ->
             area
 
+        PlaylistAction n action' ->
+            let
+                maybePlaylists' = MyList.getAt n playlists
+                `Maybe.andThen` Just <| Playlist.update action'
+                `Maybe.andThen` MyList.insertAt n
+                `Maybe.andThen` MyList.removeAt <| n + 1
+
+                playlists' = Maybe.withDefault area.playlists maybePlaylists
+            in
+                { area | playlists <- playlists' }
+
+
+playlistNToHtml : Signal.Address Action -> Int -> Playlist -> Html
+playlistNToHtml address n playlist =
+    let
+        forwardingAddress = Signal.forwardTo address <| PlaylistAction n
+    in
+        Playlist.view forwardingAddress playlist
+
 
 view : Signal.Address Action -> PlaylistArea -> Html
 view address area =
     let
-        forwardingAddress = Signal.forwardTo address PlaylistAction
-        playlistHtmls =
-            List.map (Playlist.view forwardingAddress) area.playlists
+        playlistHtmls = List.indexedMap (playlistNToHtml address) area.playlists
     in
         div [] playlistHtmls
