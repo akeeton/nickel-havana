@@ -13,7 +13,7 @@ import MyList exposing(..)
 zeroToFive = [0, 1, 2, 3, 4, 5]
 
 
-getAtTests = 
+getAtTests =
     test "getAtTests (ignore 'passed')" (assert True) :: List.map defaultTest
     [ Nothing `assertEqual` getAt -1 zeroToFive
     , Just 0 `assertEqual` getAt 0 zeroToFive
@@ -46,6 +46,19 @@ removeAtTests =
     , Just [0, 2, 3, 4, 5] `assertEqual` removeAt 1 zeroToFive
     , Just [0, 1, 2, 3, 4] `assertEqual` removeAt 5 zeroToFive
     , Nothing `assertEqual` removeAt 6 zeroToFive
+    ]
+
+
+replaceAtTests =
+    test "replaceAtTests (ignore 'passed')" (assert True) :: List.map defaultTest
+    [ Nothing `assertEqual` replaceAt 9 -1 zeroToFive
+    , Just [9, 1, 2, 3, 4, 5] `assertEqual` replaceAt 9 0 zeroToFive
+    , Just [0, 9, 2, 3, 4, 5] `assertEqual` replaceAt 9 1 zeroToFive
+    , Just [0, 1, 9, 3, 4, 5] `assertEqual` replaceAt 9 2 zeroToFive
+    , Just [0, 1, 2, 9, 4, 5] `assertEqual` replaceAt 9 3 zeroToFive
+    , Just [0, 1, 2, 3, 9, 5] `assertEqual` replaceAt 9 4 zeroToFive
+    , Just [0, 1, 2, 3, 4, 9] `assertEqual` replaceAt 9 5 zeroToFive
+    , Nothing `assertEqual` replaceAt 9 6 zeroToFive
     ]
 
 
