@@ -7,7 +7,7 @@ module PlaylistArea
     )
     where
 
-import Debug -- TODO akeeton: Remove
+-- import Debug -- TODO akeeton: Remove
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
 import Html.Events exposing (onClick, on, targetValue)
@@ -20,7 +20,7 @@ import Playlist exposing (Playlist)
 type alias PlaylistArea =
     { playlists: List Playlist
     , importTextAreaInput : String
-    , importPreviewPlaylist : Result String Playlist
+    , importablePlaylist : Result String Playlist
     }
 
 
@@ -36,7 +36,7 @@ init : List Playlist -> PlaylistArea
 init playlists =
     { playlists = playlists
     , importTextAreaInput = "Playlist goes here"
-    , importPreviewPlaylist = Err ""
+    , importablePlaylist = Err ""
     }
 
 
@@ -58,8 +58,11 @@ update action area =
                 { area | playlists <- playlists' }
 
         ImportablePlaylistAction playlistAction ->
-            -- TODO akeeton: Remove
-            Debug.crash "ImportablePlaylistAction case not implemented in PlaylistArea.update"
+            let
+                importablePlaylist' =
+                    Result.map (Playlist.update playlistAction) area.importablePlaylist
+            in
+                { area | importablePlaylist <- importablePlaylist' }
 
         ImportPlaylist playlist ->
             { area | playlists <- playlist :: area.playlists }
@@ -67,7 +70,7 @@ update action area =
         UpdateImportTextArea input ->
             { area |
                 importTextAreaInput <- input,
-                importPreviewPlaylist <- Playlist.init input }
+                importablePlaylist <- Playlist.init input }
 
 
 playlistNToHtml : Signal.Address Action -> Int -> Playlist -> Html
@@ -93,7 +96,7 @@ view address area =
 
         -- TODO akeeton: Refactor into function
         (importPlaylistButtonAction, importablePlaylistHtml) =
-            case area.importPreviewPlaylist of
+            case area.importablePlaylist of
                 Ok importablePlaylist ->
                     let
                         forwardingAddress =
