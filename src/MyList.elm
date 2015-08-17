@@ -2,6 +2,7 @@ module MyList
     ( getAt
     , insertAt
     , removeAt
+    , replaceAt
     , move
     , isValidIndex
     )
@@ -32,6 +33,12 @@ removeAt index list =
         Just <| List.take index list ++ List.drop (index + 1) list
     else
         Nothing
+
+
+replaceAt : a -> Int -> List a -> Maybe (List a)
+replaceAt x index list =
+    insertAt x index list
+    `Maybe.andThen` removeAt (index + 1)
 
 
 move : Int -> Int -> List a -> Maybe (List a)

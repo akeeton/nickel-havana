@@ -4,65 +4,51 @@ module Main where
 --import ElmFire.Auth as Auth
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
-import Html.Events exposing (onClick, on, targetValue)
+-- import Html.Events exposing (onClick, on, targetValue)
 
-import Playlist exposing (Playlist)
+import Debug -- TODO akeeton: Remove
+-- import Playlist exposing (Playlist)
+import PlaylistArea exposing (PlaylistArea)
 import Player exposing (Player, NullPlayer)
 
 
 -- MODEL
 
 type alias Model a =
-    { playlists : List Playlist
+    { playlistArea : PlaylistArea
     , playing : Player a
-    , importTextArea : String
     }
 
 
 initialModel : Model {}
 initialModel =
-    { playlists = []
+    { playlistArea = PlaylistArea.init []
     , playing = Player.initNullPlayer
-    , importTextArea = ""
     }
 
 
 -- UPDATE
 type Action
-    = ImportPlaylist Playlist
-    | UpdateImportTextArea String
-    --| ChangePlaying Player a
-    -- | SongAction Song.Action
-    | PlaylistAction Playlist.Action
-    | DoNothing
+    = DoNothing
+    | PlaylistAreaAction PlaylistArea.Action
 
 
 update : Action -> Model a -> Model a
 update action model =
     case action of
-        ImportPlaylist playlist ->
-            { model | playlists <- playlist :: model.playlists }
+        DoNothing ->
+            model
 
-        UpdateImportTextArea text ->
-            { model | importTextArea <- text }
-
-        PlaylistAction playlistAction ->
-            case List.head model.playlists of
-                Just loadedPlaylist ->
-                    let
-                        loadedPlaylist' =
-                            Playlist.update playlistAction loadedPlaylist
-
-                        playlists' =
-                            loadedPlaylist' :: List.drop 1 model.playlists
-                    in
-                        { model | playlists <- playlists' }
-
-                Nothing ->
-                    model
+        PlaylistAreaAction playlistAreaAction ->
+            let
+                playlistArea' =
+                    PlaylistArea.update playlistAreaAction model.playlistArea
+            in
+                { model | playlistArea <- playlistArea' }
 
         otherwise ->
-            model
+            -- TODO akeeton: Remove
+            Debug.crash "Main.Action case not implemented in Main.update"
 
 
 -- VIEW
@@ -70,63 +56,14 @@ update action model =
 view : Signal.Address Action -> Model a -> Html
 view address model =
     let
-        forwardingAddress = Signal.forwardTo address PlaylistAction
+        forwardingAddress = Signal.forwardTo address PlaylistAreaAction
 
-        resImportedPlaylist = Playlist.init model.importTextArea
-
-        (importPlaylistAction, importedPlaylistHtml) =
-            case resImportedPlaylist of
-                Ok importedPlaylist ->
-                    ( ImportPlaylist importedPlaylist
-                    , Playlist.view forwardingAddress importedPlaylist
-                    )
-
-                Err message ->
-                    (DoNothing, text message)
-
-        textAreaStyle = style
-            [ ("width", "400px")
-            , ("height", "300px")
-            ]
-
-        playlistDisplay =
-            List.map (Playlist.view forwardingAddress) model.playlists
+        playlistAreaHtml =
+            PlaylistArea.view forwardingAddress model.playlistArea
     in
         div
             [ id "site" ]
-            [ div
-                [ id "playlist-import" ]
-                [ h1
-                    []
-                    [ text "Playlist Import" ]
-                , textarea
-                    [ on "input" targetValue handleImportTextAreaInput
-                    , textAreaStyle
-                    ]
-                    []
-                , div
-                    [ id "playlist-preview" ]
-                    [ importedPlaylistHtml ]
-                , button
-                    [ onClick address importPlaylistAction ]
-                    [ text "Import playlist" ]
-                ]
-                , h1
-                    []
-                    [ text "Playlists" ]
-            , div
-                [ id "playlists" ]
-                [ div
-                    [ id "playlist-display" ]
-                    playlistDisplay
-                ]
-            ]
-
-
-handleImportTextAreaInput : String -> Signal.Message
-handleImportTextAreaInput text =
-    UpdateImportTextArea text
-    |> Signal.message actions.address
+            [ playlistAreaHtml ]
 
 
 countStyle : Attribute
