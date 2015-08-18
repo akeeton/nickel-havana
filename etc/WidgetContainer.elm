@@ -8,6 +8,7 @@ module WidgetContainer
     where
 
 import Html exposing (..)
+import Signal exposing (Address)
 
 import Widget exposing (Widget)
 
@@ -37,7 +38,7 @@ update action container =
             container
 
 
-view : Signal.Address Action -> WidgetContainer -> Html
+view : Address Action -> WidgetContainer -> Html
 view address container =
     let
         forwardingAddress = Signal.forwardTo address WidgetAction
