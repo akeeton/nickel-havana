@@ -83,19 +83,6 @@ update action area =
                 importablePlaylist <- Playlist.init input }
 
 
-playlistNToHtml : Signal.Address Action -> Int -> Playlist -> Html
-playlistNToHtml address n playlist =
-    let
-        forwardingAddress = Signal.forwardTo address <| PlaylistAction n
-    in
-        Playlist.view forwardingAddress playlist
-
-
-handleImportTextAreaInput : Signal.Address Action -> String -> Signal.Message
-handleImportTextAreaInput address text =
-    Signal.message address <| UpdateImportTextArea text
-
-
 view : Signal.Address Action -> PlaylistArea -> Html
 view address area =
     let
@@ -115,6 +102,19 @@ view address area =
 type Focus
     = PlaylistIndex Int
     | Importer
+
+
+playlistNToHtml : Signal.Address Action -> Int -> Playlist -> Html
+playlistNToHtml address n playlist =
+    let
+        forwardingAddress = Signal.forwardTo address <| PlaylistAction n
+    in
+        Playlist.view forwardingAddress playlist
+
+
+handleImportTextAreaInput : Signal.Address Action -> String -> Signal.Message
+handleImportTextAreaInput address text =
+    Signal.message address <| UpdateImportTextArea text
 
 
 playlistToTabListHtml : Address Action -> List Playlist -> Html
