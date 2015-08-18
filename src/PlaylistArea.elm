@@ -188,7 +188,7 @@ focusToHtml address area =
                             , ("height", "300px")
                             ]
                         ]
-                        []
+                        [ text area.importTextAreaInput ]
                     , button
                         [ onClick address importPlaylistButtonAction ]
                         [ text "Import playlist" ]
