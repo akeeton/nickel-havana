@@ -13,18 +13,19 @@ import Task exposing (Task)
 
 -- import Playlist exposing (Playlist)
 import PlaylistArea exposing (PlaylistArea)
-import Player exposing (Player, NullPlayer)
+import SongPlayer exposing (SongPlayer)
 
 
 type alias Model a =
     { playlistArea : PlaylistArea
-    , playing : Player a
+    , songPlayer : SongPlayer
     }
 
 
 type Action
     = DoNothing
     | PlaylistAreaAction PlaylistArea.Action
+    | SongPlayerAction SongPlayer.Action
 
 
 init : (Model {}, Effects Action)
@@ -33,7 +34,7 @@ init =
         initialModel : Model {}
         initialModel =
             { playlistArea = PlaylistArea.init []
-            , playing = Player.initNullPlayer
+            , songPlayer = SongPlayer.init "http://null.example.com"
             }
     in
         ( initialModel, Effects.none)
@@ -63,14 +64,14 @@ update action model =
 view : Address Action -> Model a -> Html
 view address model =
     let
-        forwardingAddress = Signal.forwardTo address PlaylistAreaAction
-
-        playlistAreaHtml =
-            PlaylistArea.view forwardingAddress model.playlistArea
+        songPlayerHtml = songPlayerToHtml address model.songPlayer
+        playlistAreaHtml = playlistAreaToHtml address model.playlistArea
     in
         div
             [ id "site" ]
-            [ playlistAreaHtml ]
+            [ songPlayerHtml
+            , playlistAreaHtml
+            ]
 
 
 inputs : List (Signal Action)
@@ -87,6 +88,22 @@ countStyle =
         , ("width", "50px")
         , ("text-align", "center")
         ]
+
+
+playlistAreaToHtml : Address Action -> PlaylistArea -> Html
+playlistAreaToHtml address playlistArea =
+    let
+        forwardingAddress = Signal.forwardTo address PlaylistAreaAction
+    in
+        PlaylistArea.view forwardingAddress playlistArea
+
+
+songPlayerToHtml : Address Action -> SongPlayer -> Html
+songPlayerToHtml address songPlayer =
+    let
+        forwardingAddress = Signal.forwardTo address SongPlayerAction
+    in
+        SongPlayer.view forwardingAddress songPlayer
 
 
 app : App (Model {})
