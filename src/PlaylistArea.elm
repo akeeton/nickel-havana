@@ -99,18 +99,12 @@ handleImportTextAreaInput address text =
 view : Signal.Address Action -> PlaylistArea -> Html
 view address area =
     let
-
-        playlistTabsHtml =
-            div
-                [ id "playlist-tabs" ]
-                (List.indexedMap (playlistToTabHtml address) area.playlists)
-
+        playlistTabListHtml = playlistToTabListHtml address area.playlists
         focusHtml = focusToHtml address area
-        playlistHtmls = List.indexedMap (playlistNToHtml address) area.playlists
     in
         div
             [ id "playlist-area" ]
-            [ playlistTabsHtml
+            [ playlistTabListHtml
             , focusHtml
             ]
 
@@ -121,6 +115,22 @@ view address area =
 type Focus
     = PlaylistIndex Int
     | Importer
+
+
+playlistToTabListHtml : Address Action -> List Playlist -> Html
+playlistToTabListHtml address playlists =
+    let
+        playlistTabsHtmls =
+            List.indexedMap (playlistToTabHtml address) playlists
+
+        importerTabHtml =
+            button
+                [ onClick address <| ChangeFocus Importer ]
+                [ text "+" ]
+    in
+        div
+            [ id "playlist-tabs" ]
+            (playlistTabsHtmls ++ [ importerTabHtml ])
 
 
 playlistToTabHtml : Address Action -> Int -> Playlist -> Html
