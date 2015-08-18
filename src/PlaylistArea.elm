@@ -179,11 +179,11 @@ focusToHtml address area =
                             ]
                         ]
                         []
-                    , div
-                        [ id "playlist-preview" ]
-                        [ importablePlaylistHtml ]
                     , button
                         [ onClick address importPlaylistButtonAction ]
                         [ text "Import playlist" ]
+                    , div
+                        [ id "playlist-preview" ]
+                        [ importablePlaylistHtml ]
                     ]
 
