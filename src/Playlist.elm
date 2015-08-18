@@ -2,9 +2,9 @@ module Playlist
     ( Playlist
     , Action
     , init
-    , length
     , update
     , view
+    , length
     )
     where
 
@@ -24,13 +24,6 @@ type alias Playlist =
     }
 
 
-type SongDestination
-    = Up
-    | Down
-    | Top
-    | Bottom
-
-
 type Action
     = MoveSong Int SongDestination
     | DoNothing
@@ -38,11 +31,6 @@ type Action
 
 init : String -> Result String Playlist
 init = JD.decodeString decoder
-
-
-length : Playlist -> Int
-length playlist =
-    List.length playlist.songs
 
 
 update : Action -> Playlist -> Playlist
@@ -115,6 +103,18 @@ view address playlist =
         songsHtmls = List.indexedMap (songNToHtml address) playlist.songs
     in
         div [] (headerHtml :: songsHtmls)
+
+
+length : Playlist -> Int
+length playlist =
+    List.length playlist.songs
+
+
+type SongDestination
+    = Up
+    | Down
+    | Top
+    | Bottom
 
 
 decoder : JD.Decoder Playlist
