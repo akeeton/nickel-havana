@@ -43,7 +43,7 @@ update action player =
 view : Address Action -> SongPlayer -> Html
 view address player =
     let
-        embedHtml = serviceAndIdToHtml player.service player.id
+        embedHtml = toEmbedHtml player
     in
         div
             []
@@ -65,14 +65,14 @@ getServiceAndIdFromUrl url =
     in
         (service, id)
 
-serviceAndIdToHtml : Service -> String -> Html
-serviceAndIdToHtml service id =
-    case service of
+toEmbedHtml : SongPlayer -> Html
+toEmbedHtml player =
+    case player.service of
         Null ->
             div
                 []
-                [ p [] [ text "Plug.dj music service" ]
-                , p [] [ text <| toString service ]
+                [ p [] [ text "Plug.dj music service (= the null player) :D" ]
+                , p [] [ text <| toString player ]
                 ]
 
         otherwise ->
