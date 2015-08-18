@@ -12,6 +12,7 @@ import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
 import Html.Events exposing (onClick, on, targetValue)
 import Maybe as M
+import Signal exposing (Address)
 
 import MyList
 import Playlist exposing (Playlist)
@@ -31,6 +32,7 @@ type alias PlaylistArea =
 type Action
     = DoNothing
     | PlaylistAction Int Playlist.Action
+    | ChangeFocus Focus
     | ImportablePlaylistAction Playlist.Action
     | ImportPlaylist Playlist
     | UpdateImportTextArea String
@@ -61,6 +63,9 @@ update action area =
                 playlists' = M.withDefault area.playlists maybePlaylists'
             in
                 { area | playlists <- playlists' }
+
+        ChangeFocus focus' ->
+            { area | focus <- focus' }
 
         ImportablePlaylistAction playlistAction ->
             let
@@ -114,38 +119,52 @@ view address area =
                 Err message ->
                     (DoNothing, text message)
 
-        playlistTabHtmls = List.indexedMap playlistToTab area.playlists
+        playlistTabsHtml =
+            div
+                [ id "playlist-tabs" ]
+                (List.indexedMap (playlistToTabHtml address) area.playlists)
+
+        focusHtml =
+            case area.focus of
+                PlaylistIndex n ->
+                    let
+                        -- TODO akeeton: Move into playlistNToHtml
+                        maybePlaylist = MyList.getAt n area.playlists
+
+                        maybePlaylistHtml =
+                            M.map (playlistNToHtml address n) maybePlaylist
+
+                        playlistHtml =
+                            M.withDefault (text "Error") maybePlaylistHtml
+                    in
+                        div
+                            [ id <| "playlist-" ++ toString n]
+                            [ playlistHtml ]
+                Importer ->
+                    div
+                        [ id "playlist-importer" ]
+                        [ h1
+                            []
+                            [ text "Playlist Importer" ]
+                        , textarea
+                            [ on "input" targetValue <| handleImportTextAreaInput address
+                            , textAreaStyle
+                            ]
+                            []
+                        , div
+                            [ id "playlist-preview" ]
+                            [ importablePlaylistHtml ]
+                        , button
+                            [ onClick address importPlaylistButtonAction ]
+                            [ text "Import playlist" ]
+                        ]
 
         playlistHtmls = List.indexedMap (playlistNToHtml address) area.playlists
     in
         div
             [ id "playlist-area" ]
-            [ div
-                [ id "playlist-tabs" ]
-                playlistTabHtmls
-            , div
-                [ id "playlist-import" ]
-                [ h1
-                    []
-                    [ text "Playlist Import" ]
-                , textarea
-                    [ on "input" targetValue <| handleImportTextAreaInput address
-                    , textAreaStyle
-                    ]
-                    []
-                , div
-                    [ id "playlist-preview" ]
-                    [ importablePlaylistHtml ]
-                , button
-                    [ onClick address importPlaylistButtonAction ]
-                    [ text "Import playlist" ]
-                ]
-                , h1
-                    []
-                    [ text "Playlists" ]
-            , div
-                [ id "playlists" ]
-                playlistHtmls
+            [ playlistTabsHtml
+            , focusHtml
             ]
 
 
@@ -153,13 +172,15 @@ view address area =
 
 
 type Focus
-    = Index Int
+    = PlaylistIndex Int
     | Importer
 
 
-playlistToTab : Int -> Playlist -> Html
-playlistToTab n playlist =
+playlistToTabHtml : Address Action -> Int -> Playlist -> Html
+playlistToTabHtml address n playlist =
     let
         label = toString (n + 1) ++ ": " ++ Playlist.name playlist
+        action = ChangeFocus <| PlaylistIndex n
     in
-        button [] [ text label ]
+        button [ onClick address action ] [ text label ]
+
