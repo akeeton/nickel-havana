@@ -75,7 +75,7 @@ update action area =
                 { area | importablePlaylist <- importablePlaylist' }
 
         ImportPlaylist playlist ->
-            { area | playlists <- playlist :: area.playlists }
+            { area | playlists <- area.playlists ++ [ playlist ] }
 
         UpdateImportTextArea input ->
             { area |
