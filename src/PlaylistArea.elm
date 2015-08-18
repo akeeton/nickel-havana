@@ -99,66 +99,13 @@ handleImportTextAreaInput address text =
 view : Signal.Address Action -> PlaylistArea -> Html
 view address area =
     let
-        textAreaStyle = style
-            [ ("width", "400px")
-            , ("height", "300px")
-            ]
-
-        -- TODO akeeton: Refactor into function
-        (importPlaylistButtonAction, importablePlaylistHtml) =
-            case area.importablePlaylist of
-                Ok importablePlaylist ->
-                    let
-                        forwardingAddress =
-                            Signal.forwardTo address ImportablePlaylistAction
-                    in
-                        ( ImportPlaylist importablePlaylist
-                        , Playlist.view forwardingAddress importablePlaylist
-                        )
-
-                Err message ->
-                    (DoNothing, text message)
 
         playlistTabsHtml =
             div
                 [ id "playlist-tabs" ]
                 (List.indexedMap (playlistToTabHtml address) area.playlists)
 
-        focusHtml =
-            case area.focus of
-                PlaylistIndex n ->
-                    let
-                        -- TODO akeeton: Move into playlistNToHtml
-                        maybePlaylist = MyList.getAt n area.playlists
-
-                        maybePlaylistHtml =
-                            M.map (playlistNToHtml address n) maybePlaylist
-
-                        playlistHtml =
-                            M.withDefault (text "Error") maybePlaylistHtml
-                    in
-                        div
-                            [ id <| "playlist-" ++ toString n]
-                            [ playlistHtml ]
-                Importer ->
-                    div
-                        [ id "playlist-importer" ]
-                        [ h1
-                            []
-                            [ text "Playlist Importer" ]
-                        , textarea
-                            [ on "input" targetValue <| handleImportTextAreaInput address
-                            , textAreaStyle
-                            ]
-                            []
-                        , div
-                            [ id "playlist-preview" ]
-                            [ importablePlaylistHtml ]
-                        , button
-                            [ onClick address importPlaylistButtonAction ]
-                            [ text "Import playlist" ]
-                        ]
-
+        focusHtml = focusToHtml address area
         playlistHtmls = List.indexedMap (playlistNToHtml address) area.playlists
     in
         div
@@ -183,4 +130,60 @@ playlistToTabHtml address n playlist =
         action = ChangeFocus <| PlaylistIndex n
     in
         button [ onClick address action ] [ text label ]
+
+
+focusToHtml : Address Action -> PlaylistArea -> Html
+focusToHtml address area =
+    case area.focus of
+        PlaylistIndex n ->
+            let
+                -- TODO akeeton: Move into playlistNToHtml
+                maybePlaylist = MyList.getAt n area.playlists
+
+                maybePlaylistHtml =
+                    M.map (playlistNToHtml address n) maybePlaylist
+
+                playlistHtml =
+                    M.withDefault (text "Error") maybePlaylistHtml
+            in
+                div
+                    [ id <| "playlist-" ++ toString n]
+                    [ playlistHtml ]
+        Importer ->
+            let
+                -- TODO akeeton: Refactor into function
+                (importPlaylistButtonAction, importablePlaylistHtml) =
+                    case area.importablePlaylist of
+                        Ok importablePlaylist ->
+                            let
+                                forwardingAddress =
+                                    Signal.forwardTo address ImportablePlaylistAction
+                            in
+                                ( ImportPlaylist importablePlaylist
+                                , Playlist.view forwardingAddress importablePlaylist
+                                )
+
+                        Err message ->
+                            (DoNothing, text message)
+            in
+                div
+                    [ id "playlist-importer" ]
+                    [ h1
+                        []
+                        [ text "Playlist Importer" ]
+                    , textarea
+                        [ on "input" targetValue <| handleImportTextAreaInput address
+                        , style
+                            [ ("width", "400px")
+                            , ("height", "300px")
+                            ]
+                        ]
+                        []
+                    , div
+                        [ id "playlist-preview" ]
+                        [ importablePlaylistHtml ]
+                    , button
+                        [ onClick address importPlaylistButtonAction ]
+                        [ text "Import playlist" ]
+                    ]
 
