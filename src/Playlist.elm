@@ -4,6 +4,7 @@ module Playlist
     , init
     , update
     , view
+    , name
     , length
     )
     where
@@ -103,6 +104,11 @@ view address playlist =
         songsHtmls = List.indexedMap (songNToHtml address) playlist.songs
     in
         div [] (headerHtml :: songsHtmls)
+
+
+name : Playlist -> String
+name =
+    .name
 
 
 length : Playlist -> Int

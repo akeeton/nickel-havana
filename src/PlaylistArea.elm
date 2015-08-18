@@ -17,8 +17,12 @@ import MyList
 import Playlist exposing (Playlist)
 
 
+-- Public definitions
+
+
 type alias PlaylistArea =
     { playlists: List Playlist
+    , focus : Focus
     , importTextAreaInput : String
     , importablePlaylist : Result String Playlist
     }
@@ -35,6 +39,7 @@ type Action
 init : List Playlist -> PlaylistArea
 init playlists =
     { playlists = playlists
+    , focus = Importer
     , importTextAreaInput = "Playlist goes here"
     , importablePlaylist = Err ""
     }
@@ -109,11 +114,16 @@ view address area =
                 Err message ->
                     (DoNothing, text message)
 
+        playlistTabHtmls = List.indexedMap playlistToTab area.playlists
+
         playlistHtmls = List.indexedMap (playlistNToHtml address) area.playlists
     in
         div
             [ id "playlist-area" ]
             [ div
+                [ id "playlist-tabs" ]
+                playlistTabHtmls
+            , div
                 [ id "playlist-import" ]
                 [ h1
                     []
@@ -137,3 +147,19 @@ view address area =
                 [ id "playlists" ]
                 playlistHtmls
             ]
+
+
+-- Private definitions
+
+
+type Focus
+    = Index Int
+    | Importer
+
+
+playlistToTab : Int -> Playlist -> Html
+playlistToTab n playlist =
+    let
+        label = toString (n + 1) ++ ": " ++ Playlist.name playlist
+    in
+        button [] [ text label ]
