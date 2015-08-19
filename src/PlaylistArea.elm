@@ -198,7 +198,9 @@ focusToHtml address area =
                         [ text "Import playlist" ]
                     , div
                         [ id "playlist-preview" ]
-                        [ importablePlaylistHtml ]
+                        [ h2 [] [ text "Preview" ]
+                        , importablePlaylistHtml
+                        ]
                     ]
 
 

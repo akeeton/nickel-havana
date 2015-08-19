@@ -100,7 +100,7 @@ songNToHtml address n song =
 view : Signal.Address Action -> Playlist -> Html
 view address playlist =
     let
-        headerHtml = h2 [] [ text playlist.name ]
+        headerHtml = h3 [] [ text playlist.name ]
         songsHtmls = List.indexedMap (songNToHtml address) playlist.songs
     in
         div [] (headerHtml :: songsHtmls)

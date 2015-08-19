@@ -22,7 +22,7 @@ view : Song -> Html
 view song =
     div
         []
-        [ h3 [] [ text song.title ]
+        [ h4 [] [ text song.title ]
         , p [] [ text song.url ]
         , p [] [ text song.startTime ]
         , p [] [ text song.endTime ]
