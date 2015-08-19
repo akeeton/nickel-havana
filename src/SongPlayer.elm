@@ -8,13 +8,14 @@ module SongPlayer
     where
 
 import Html exposing (..)
+import Html.Attributes exposing (height, id, src, style, type', width)
 import Signal exposing (Address)
 
 
 type alias SongPlayer =
     { service : Service
     , url : String
-    , id : String
+    , identity : String
     }
 
 
@@ -25,11 +26,11 @@ type Action
 init : String -> SongPlayer
 init url =
     let
-        (service, id) = getServiceAndIdFromUrl url
+        (service, identity) = getServiceAndIdFromUrl url
     in
         { service = service
         , url = url
-        , id = id
+        , identity = identity
         }
 
 
@@ -60,10 +61,10 @@ type Service
 getServiceAndIdFromUrl : String -> (Service, String)
 getServiceAndIdFromUrl url =
     let
-        service = Null
-        id = "id"
+        service = Youtube
+        identity = "vR5HJp_xXRs"
     in
-        (service, id)
+        (service, identity)
 
 
 toEmbedHtml : SongPlayer -> Html
@@ -76,30 +77,20 @@ toEmbedHtml player =
                 , p [] [ text <| toString player ]
                 ]
 
+        Youtube ->
+            let
+                srcUrl = "https://www.youtube.com/embed/" ++ player.identity ++ "?autoplay=1&controls=0&disablekb=1&enablejsapi=1&fs=0&rel=0&iv_load_policy=3"
+            in
+                iframe
+                    [ id "ytplayer"
+                    , type' "text/html"
+                    , width 720
+                    , height 405
+                    , src srcUrl
+                    , style [("border", "0")]
+                    ]
+                    []
+
         otherwise ->
             div [] [ text "NOT IMPLEMENTED!!!" ]
 
-
-
-{-
-    List.map Youtube ["vR5HJp_xXRs", "RwpjyLUj0XU"]
-
-
-toHtml : Maybe Source -> Html
-toHtml maybeSource =
-  case maybeSource of
-    Nothing -> iframe [] []
-
-    Just (Youtube videoId) ->
-      let
-        srcUrl = "https://www.youtube.com/embed/" ++ videoId ++ "?autoplay=1&controls=0&disablekb=1&enablejsapi=1&fs=0&rel=0&iv_load_policy=3"
-      in
-        iframe
-          [ id "ytplayer"
-          , type' "text/html"
-          , width 720
-          , height 405
-          , src srcUrl
-          , style [("border", "0")]
-          ] []
--}
