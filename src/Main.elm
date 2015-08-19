@@ -69,7 +69,9 @@ view address model =
     in
         div
             [ id "site" ]
-            [ songPlayerHtml
+            [ h1 [] [ text "Song Player" ]
+            , songPlayerHtml
+            , hr [] []
             , playlistAreaHtml
             ]
 
