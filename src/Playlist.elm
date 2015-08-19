@@ -130,27 +130,3 @@ decoder =
         ("name" := JD.string)
         ("songs" := JD.list Song.decoder)
 
-
-{-
-    List.map Youtube ["vR5HJp_xXRs", "RwpjyLUj0XU"]
-
-
-toHtml : Maybe Source -> Html
-toHtml maybeSource =
-  case maybeSource of
-    Nothing -> iframe [] []
-
-    Just (Youtube videoId) ->
-      let
-        srcUrl = "https://www.youtube.com/embed/" ++ videoId ++ "?autoplay=1&controls=0&disablekb=1&enablejsapi=1&fs=0&rel=0&iv_load_policy=3"
-      in
-        iframe
-          [ id "ytplayer"
-          , type' "text/html"
-          , width 720
-          , height 405
-          , src srcUrl
-          , style [("border", "0")]
-          ] []
--}
-
