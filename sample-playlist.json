@@ -1,23 +1,23 @@
 {
-    "name": "Playlist name",
+    "name": "Sample playlist",
     "songs":
         [
             {
-                "title": "Song 1",
-                "url": "http://url1.example.com",
+                "title": "Corgis! (not original title)",
+                "url": "https://www.youtube.com/watch?v=IAoVY2bQ8u4",
                 "startTime": "",
                 "endTime": ""
             },
 
             {
-                "title": "Song 2",
-                "url": "http://url2.example.com",
-                "startTime": "1m",
-                "endTime": "4m30s"
+                "title": "Cats! (not original title)",
+                "url": "https://youtu.be/AvPNaJ8OWCM",
+                "startTime": "",
+                "endTime": ""
             },
 
             {
-                "title": "Song 3",
+                "title": "Nothing!",
                 "url": "http://url3.example.com",
                 "startTime": "",
                 "endTime": "3m7s"
