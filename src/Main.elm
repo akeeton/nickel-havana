@@ -16,7 +16,7 @@ import PlaylistArea exposing (PlaylistArea)
 import SongPlayer exposing (SongPlayer)
 
 
-type alias Model a =
+type alias Model =
     { playlistArea : PlaylistArea
     , songPlayer : SongPlayer
     }
@@ -28,10 +28,10 @@ type Action
     | SongPlayerAction SongPlayer.Action
 
 
-init : (Model {}, Effects Action)
+init : (Model, Effects Action)
 init =
     let
-        initialModel : Model {}
+        initialModel : Model
         initialModel =
             { playlistArea = PlaylistArea.init []
             , songPlayer = SongPlayer.init "http://null.example.com"
@@ -40,7 +40,7 @@ init =
         ( initialModel, Effects.none)
 
 
-update : Action -> Model a -> (Model a, Effects Action)
+update : Action -> Model -> (Model, Effects Action)
 update action model =
     let
         model' = case action of
@@ -61,7 +61,7 @@ update action model =
         (model', Effects.none)
 
 
-view : Address Action -> Model a -> Html
+view : Address Action -> Model -> Html
 view address model =
     let
         songPlayerHtml = songPlayerToHtml address model.songPlayer
@@ -106,7 +106,7 @@ songPlayerToHtml address songPlayer =
         SongPlayer.view forwardingAddress songPlayer
 
 
-app : App (Model {})
+app : App Model
 app =
     start { init = init, view = view, update = update, inputs = inputs }
 
