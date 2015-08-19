@@ -104,7 +104,10 @@ toEmbedHtml player =
             div [] [ text "NOT IMPLEMENTED!!!" ]
 
 
+-- From http://stackoverflow.com/a/5831191/68086
+-- This regex matches more than what is needed.  For example, it will match in
+-- an <a> tag.
 youtubeRegex : Regex
 youtubeRegex =
-    regex "youtube(?:-nocookie)?\\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\\.be/)([^\"&?/ ]{11})%i"
+    regex "https?:\\/\\/(?:[0-9A-Z-]+\\.)?(?:youtu\\.be\\/|youtube(?:-nocookie)?\\.com\\S*[^\\w\\s-])([\\w-]{11})(?=[^\\w-]|$)(?![?=&+%\\w.-]*(?:['\"][^<>]*>|<\\/a>))[?=&+%\\w.-]*"
 
