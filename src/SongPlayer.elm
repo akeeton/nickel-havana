@@ -65,6 +65,7 @@ getServiceAndIdFromUrl url =
     in
         (service, id)
 
+
 toEmbedHtml : SongPlayer -> Html
 toEmbedHtml player =
     case player.service of

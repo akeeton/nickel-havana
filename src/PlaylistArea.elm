@@ -40,11 +40,17 @@ type Action
 
 init : List Playlist -> PlaylistArea
 init playlists =
-    { playlists = playlists
-    , focus = Importer
-    , importTextAreaInput = "Playlist goes here"
-    , importablePlaylist = Err ""
-    }
+    let
+        area =
+            { playlists = playlists
+            , focus = Importer
+            , importTextAreaInput = ""
+            , importablePlaylist = Err ""
+            }
+
+        areaWithSamplePlaylist = updateImportTextArea samplePlaylist area
+    in
+        areaWithSamplePlaylist
 
 
 update : Action -> PlaylistArea -> PlaylistArea
@@ -78,9 +84,7 @@ update action area =
             { area | playlists <- area.playlists ++ [ playlist ] }
 
         UpdateImportTextArea input ->
-            { area |
-                importTextAreaInput <- input,
-                importablePlaylist <- Playlist.init input }
+            updateImportTextArea input area
 
 
 view : Signal.Address Action -> PlaylistArea -> Html
@@ -197,3 +201,39 @@ focusToHtml address area =
                         [ importablePlaylistHtml ]
                     ]
 
+
+updateImportTextArea : String -> PlaylistArea -> PlaylistArea
+updateImportTextArea input area =
+    { area |
+        importTextAreaInput <- input,
+        importablePlaylist <- Playlist.init input }
+
+
+samplePlaylist : String
+samplePlaylist =
+    """{
+    "name": "Playlist name",
+    "songs":
+        [
+            {
+                "title": "Song 1",
+                "url": "http://url1.example.com",
+                "startTime": "",
+                "endTime": ""
+            },
+
+            {
+                "title": "Song 2",
+                "url": "http://url2.example.com",
+                "startTime": "1m",
+                "endTime": "4m30s"
+            },
+
+            {
+                "title": "Song 3",
+                "url": "http://url3.example.com",
+                "startTime": "",
+                "endTime": "3m7s"
+            }
+        ]
+}"""
