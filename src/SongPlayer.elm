@@ -7,6 +7,7 @@ module SongPlayer
     )
     where
 
+import Debug
 import Html exposing (..)
 import Html.Attributes exposing (height, id, src, style, type', width)
 import Regex exposing (Regex, regex)
@@ -69,6 +70,7 @@ parseYoutubeUrl url =
     let
         matches : List Regex.Match
         matches = Regex.find (Regex.AtMost 1) youtubeRegex url
+        _=Debug.log "matches" matches
     in
         List.head matches
         `Maybe.andThen` (\match -> List.head match.submatches)
@@ -103,11 +105,14 @@ toEmbedHtml player =
         otherwise ->
             div [] [ text "NOT IMPLEMENTED!!!" ]
 
-
--- From http://stackoverflow.com/a/5831191/68086
--- This regex matches more than what is needed.  For example, it will match in
--- an <a> tag.
+-- http://stackoverflow.com/a/6382259/68086
 youtubeRegex : Regex
 youtubeRegex =
-    regex "https?:\\/\\/(?:[0-9A-Z-]+\\.)?(?:youtu\\.be\\/|youtube(?:-nocookie)?\\.com\\S*[^\\w\\s-])([\\w-]{11})(?=[^\\w-]|$)(?![?=&+%\\w.-]*(?:['\"][^<>]*>|<\\/a>))[?=&+%\\w.-]*"
+    regex "(?:youtube(?:-nocookie)?\\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\\.be/)([^\"&?/ ]{11})"
 
+-- http://stackoverflow.com/a/5831191/68086
+-- An alternative that didn't work on a watch?v= link for me.
+--
+-- This regex matches more than what is needed.  For example, it will match in
+-- an <a> tag.
+-- "https?:\\/\\/(?:[0-9A-Z-]+\\.)?(?:youtu\\.be\\/|youtube(?:-nocookie)?\\.com\\S*[^\\w\\s-])([\\w-]{11})(?=[^\\w-]|$)(?![?=&+%\\w.-]*(?:['\"][^<>]*>|<\\/a>))[?=&+%\\w.-]*"
