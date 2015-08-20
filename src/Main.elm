@@ -60,17 +60,24 @@ update action model =
                     { model | playlistArea <- playlistArea' }
 
             Play ->
-                { model | playing <- True }
+                if model.playing then
+                    model
+                else
+                    loadActiveSongIntoSongPlayer { model | playing <- True }
 
             Skip ->
                 let
                     playlistArea' =
                         PlaylistArea.cycleActivePlaylist model.playlistArea
+
+                    model' = { model | playlistArea <- playlistArea' }
                 in
-                    { model | playlistArea <- playlistArea' }
+                    loadActiveSongIntoSongPlayer model'
 
             Stop ->
-                { model | playing <- False }
+                { model |
+                    playing <- False,
+                    songPlayer <- SongPlayer.init "http://null.example.com" }
 
             otherwise ->
                 -- TODO akeeton: Remove
@@ -95,11 +102,6 @@ view address model =
             , hr [] []
             , playlistAreaHtml
             ]
-
-
-inputs : List (Signal Action)
-inputs =
-    []
 
 
 countStyle : Attribute
@@ -127,6 +129,21 @@ songPlayerToHtml address songPlayer =
         forwardingAddress = Signal.forwardTo address SongPlayerAction
     in
         SongPlayer.view forwardingAddress songPlayer
+
+
+loadActiveSongIntoSongPlayer : Model -> Model
+loadActiveSongIntoSongPlayer model =
+    case PlaylistArea.getActiveSong model.playlistArea of
+        Just song ->
+            { model | songPlayer <- SongPlayer.init song.url }
+
+        Nothing ->
+            model
+
+
+inputs : List (Signal Action)
+inputs =
+    []
 
 
 app : App Model
