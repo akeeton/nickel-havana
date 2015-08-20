@@ -24,6 +24,7 @@ import Playlist exposing (Playlist)
 type alias PlaylistArea =
     { playlists: List Playlist
     , focus : Focus
+    , activePlaylist : Int
     , importTextAreaInput : String
     , importablePlaylist : Result String Playlist
     }
@@ -33,6 +34,7 @@ type Action
     = DoNothing
     | PlaylistAction Int Playlist.Action
     | ChangeFocus Focus
+    | ChangeActivePlaylist Int
     | ImportablePlaylistAction Playlist.Action
     | ImportPlaylist Playlist
     | UpdateImportTextArea String
@@ -44,6 +46,7 @@ init playlists =
         area =
             { playlists = playlists
             , focus = Importer
+            , activePlaylist = 0
             , importTextAreaInput = ""
             , importablePlaylist = Err ""
             }
@@ -73,6 +76,9 @@ update action area =
         ChangeFocus focus' ->
             { area | focus <- focus' }
 
+        ChangeActivePlaylist n ->
+            { area | activePlaylist <- n }
+
         ImportablePlaylistAction playlistAction ->
             let
                 importablePlaylist' =
@@ -90,7 +96,9 @@ update action area =
 view : Signal.Address Action -> PlaylistArea -> Html
 view address area =
     let
-        playlistTabListHtml = playlistToTabListHtml address area.playlists
+        playlistTabListHtml =
+            playlistToTabListHtml address area.activePlaylist area.playlists
+
         focusHtml = focusToHtml address area
     in
         div
@@ -121,11 +129,11 @@ handleImportTextAreaInput address text =
     Signal.message address <| UpdateImportTextArea text
 
 
-playlistToTabListHtml : Address Action -> List Playlist -> Html
-playlistToTabListHtml address playlists =
+playlistToTabListHtml : Address Action -> Int -> List Playlist -> Html
+playlistToTabListHtml address activePlaylist playlists =
     let
         playlistTabsHtmls =
-            List.indexedMap (playlistToTabHtml address) playlists
+            List.indexedMap (playlistToTabHtml address activePlaylist) playlists
 
         importerTabHtml =
             button
@@ -137,10 +145,14 @@ playlistToTabListHtml address playlists =
             (playlistTabsHtmls ++ [ importerTabHtml ])
 
 
-playlistToTabHtml : Address Action -> Int -> Playlist -> Html
-playlistToTabHtml address n playlist =
+playlistToTabHtml : Address Action -> Int -> Int -> Playlist -> Html
+playlistToTabHtml address activePlaylist n playlist =
     let
-        label = toString (n + 1) ++ ": " ++ Playlist.name playlist
+        marker =
+            if activePlaylist == n then "*"
+            else ""
+
+        label = marker ++ toString (n + 1) ++ ": " ++ Playlist.name playlist
         action = ChangeFocus <| PlaylistIndex n
     in
         button [ onClick address action ] [ text label ]
@@ -162,7 +174,12 @@ focusToHtml address area =
             in
                 div
                     [ id <| "playlist-" ++ toString n]
-                    [ playlistHtml ]
+                    [ button
+                        [ onClick address <| ChangeActivePlaylist n ]
+                        [ text "Make active" ]
+                    , playlistHtml
+                    ]
+
         Importer ->
             let
                 -- TODO akeeton: Refactor into function
@@ -214,25 +231,25 @@ updateImportTextArea input area =
 samplePlaylist : String
 samplePlaylist =
     """{
-    "name": "Playlist name",
+    "name": "Sample playlist",
     "songs":
         [
             {
-                "title": "Song 1",
-                "url": "http://url1.example.com",
+                "title": "Corgis!",
+                "url": "https://www.youtube.com/watch?v=IAoVY2bQ8u4",
                 "startTime": "",
                 "endTime": ""
             },
 
             {
-                "title": "Song 2",
-                "url": "http://url2.example.com",
-                "startTime": "1m",
-                "endTime": "4m30s"
+                "title": "Cats!",
+                "url": "https://youtu.be/AvPNaJ8OWCM",
+                "startTime": "",
+                "endTime": ""
             },
 
             {
-                "title": "Song 3",
+                "title": "Nothing!",
                 "url": "http://url3.example.com",
                 "startTime": "",
                 "endTime": "3m7s"
