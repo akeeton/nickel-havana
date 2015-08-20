@@ -21,7 +21,6 @@ import MyList
 import Playlist exposing (Playlist)
 import Song exposing (Song)
 
-
 -- Public definitions
 
 
@@ -131,7 +130,6 @@ cycleActivePlaylist area =
 
         Nothing ->
             area
-
 
 -- Private definitions
 

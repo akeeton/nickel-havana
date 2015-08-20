@@ -20,16 +20,13 @@ import List
 import MyList
 import Song exposing (Song)
 
+-- Public definitions
+
 
 type alias Playlist =
     { name: String
     , songs: List Song
     }
-
-
-type Action
-    = MoveSong Int SongDestination
-    | DoNothing
 
 
 init : String -> Result String Playlist
@@ -80,25 +77,6 @@ songDestinationToString destination =
             "Bottom"
 
 
-songNToHtml : Signal.Address Action -> Int -> Song -> Html
-songNToHtml address n song =
-    let
-        makeMoveButton : SongDestination -> Html
-        makeMoveButton destination =
-            button
-                [ onClick address <| MoveSong n destination ]
-                [ text <| songDestinationToString destination ]
-    in
-        div
-            []
-            [ makeMoveButton Up
-            , makeMoveButton Down
-            , makeMoveButton Top
-            , makeMoveButton Bottom
-            , Song.view song
-            ]
-
-
 view : Signal.Address Action -> Playlist -> Html
 view address playlist =
     let
@@ -118,21 +96,6 @@ length playlist =
     List.length playlist.songs
 
 
-type SongDestination
-    = Up
-    | Down
-    | Top
-    | Bottom
-
-
-decoder : JD.Decoder Playlist
-decoder =
-    JD.object2
-        (\name songs -> { name = name, songs = songs })
-        ("name" := JD.string)
-        ("songs" := JD.list Song.decoder)
-
-
 getActiveSong : Playlist -> Maybe Song
 getActiveSong playlist =
     List.head playlist.songs
@@ -148,5 +111,46 @@ cycle playlist =
         songs' = Maybe.withDefault [] maybeSongs'
     in
         { playlist | songs <- songs' }
+
+-- Private definitions
+
+
+type Action
+    = MoveSong Int SongDestination
+    | DoNothing
+
+
+songNToHtml : Signal.Address Action -> Int -> Song -> Html
+songNToHtml address n song =
+    let
+        makeMoveButton : SongDestination -> Html
+        makeMoveButton destination =
+            button
+                [ onClick address <| MoveSong n destination ]
+                [ text <| songDestinationToString destination ]
+    in
+        div
+            []
+            [ makeMoveButton Up
+            , makeMoveButton Down
+            , makeMoveButton Top
+            , makeMoveButton Bottom
+            , Song.view song
+            ]
+
+
+type SongDestination
+    = Up
+    | Down
+    | Top
+    | Bottom
+
+
+decoder : JD.Decoder Playlist
+decoder =
+    JD.object2
+        (\name songs -> { name = name, songs = songs })
+        ("name" := JD.string)
+        ("songs" := JD.list Song.decoder)
 
 

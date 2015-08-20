@@ -9,6 +9,8 @@ import Html exposing (..)
 import Json.Decode as JD
 import Json.Decode exposing ((:=))
 
+-- Public definitions
+
 
 type alias Song =
     { title : String
