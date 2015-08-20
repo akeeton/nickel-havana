@@ -4,6 +4,9 @@ module PlaylistArea
     , init
     , update
     , view
+    , getActivePlaylist
+    , getActiveSong
+    , cycleActivePlaylist
     )
     where
 
@@ -16,6 +19,7 @@ import Signal exposing (Address)
 
 import MyList
 import Playlist exposing (Playlist)
+import Song exposing (Song)
 
 
 -- Public definitions
@@ -24,7 +28,7 @@ import Playlist exposing (Playlist)
 type alias PlaylistArea =
     { playlists: List Playlist
     , focus : Focus
-    , activePlaylist : Int
+    , activePlaylistIndex : Int
     , importTextAreaInput : String
     , importablePlaylist : Result String Playlist
     }
@@ -46,7 +50,7 @@ init playlists =
         area =
             { playlists = playlists
             , focus = Importer
-            , activePlaylist = 0
+            , activePlaylistIndex = 0
             , importTextAreaInput = ""
             , importablePlaylist = Err ""
             }
@@ -77,7 +81,7 @@ update action area =
             { area | focus <- focus' }
 
         ChangeActivePlaylist n ->
-            { area | activePlaylist <- n }
+            { area | activePlaylistIndex <- n }
 
         ImportablePlaylistAction playlistAction ->
             let
@@ -97,7 +101,7 @@ view : Signal.Address Action -> PlaylistArea -> Html
 view address area =
     let
         playlistTabListHtml =
-            playlistToTabListHtml address area.activePlaylist area.playlists
+            playlistToTabListHtml address area.activePlaylistIndex area.playlists
 
         focusHtml = focusToHtml address area
     in
@@ -106,6 +110,27 @@ view address area =
             [ playlistTabListHtml
             , focusHtml
             ]
+
+
+getActivePlaylist : PlaylistArea -> Maybe Playlist
+getActivePlaylist area =
+    MyList.getAt area.activePlaylistIndex area.playlists
+
+
+getActiveSong : PlaylistArea -> Maybe Song
+getActiveSong area =
+    getActivePlaylist area
+    `Maybe.andThen` (\playlist -> Playlist.getActiveSong playlist)
+
+
+cycleActivePlaylist : PlaylistArea -> PlaylistArea
+cycleActivePlaylist area =
+    case getActivePlaylist area of
+        Just activePlaylist ->
+            replaceActivePlaylist area <| Playlist.cycle activePlaylist
+
+        Nothing ->
+            area
 
 
 -- Private definitions
@@ -130,10 +155,10 @@ handleImportTextAreaInput address text =
 
 
 playlistToTabListHtml : Address Action -> Int -> List Playlist -> Html
-playlistToTabListHtml address activePlaylist playlists =
+playlistToTabListHtml address activePlaylistIndex playlists =
     let
         playlistTabsHtmls =
-            List.indexedMap (playlistToTabHtml address activePlaylist) playlists
+            List.indexedMap (playlistToTabHtml address activePlaylistIndex) playlists
 
         importerTabHtml =
             button
@@ -146,10 +171,10 @@ playlistToTabListHtml address activePlaylist playlists =
 
 
 playlistToTabHtml : Address Action -> Int -> Int -> Playlist -> Html
-playlistToTabHtml address activePlaylist n playlist =
+playlistToTabHtml address activePlaylistIndex n playlist =
     let
         marker =
-            if activePlaylist == n then "*"
+            if activePlaylistIndex == n then "*"
             else ""
 
         label = marker ++ toString (n + 1) ++ ": " ++ Playlist.name playlist
@@ -226,6 +251,16 @@ updateImportTextArea input area =
     { area |
         importTextAreaInput <- input,
         importablePlaylist <- Playlist.init input }
+
+
+replaceActivePlaylist : PlaylistArea -> Playlist -> PlaylistArea
+replaceActivePlaylist area activePlaylist' =
+    case MyList.replaceAt activePlaylist' area.activePlaylistIndex area.playlists of
+        Just playlists' ->
+            { area | playlists <- playlists' }
+
+        Nothing ->
+            area
 
 
 samplePlaylist : String

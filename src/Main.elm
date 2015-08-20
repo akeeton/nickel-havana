@@ -6,7 +6,7 @@ import Effects exposing (Effects, Never)
 --import ElmFire.Auth as Auth
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
--- import Html.Events exposing (onClick, on, targetValue)
+import Html.Events exposing (onClick, on, targetValue)
 import Signal exposing (Address)
 import StartApp exposing (App, start)
 import Task exposing (Task)
@@ -19,6 +19,7 @@ import SongPlayer exposing (SongPlayer)
 type alias Model =
     { playlistArea : PlaylistArea
     , songPlayer : SongPlayer
+    , playing : Bool
     }
 
 
@@ -26,6 +27,9 @@ type Action
     = DoNothing
     | PlaylistAreaAction PlaylistArea.Action
     | SongPlayerAction SongPlayer.Action
+    | Play
+    | Skip
+    | Stop
 
 
 init : (Model, Effects Action)
@@ -35,6 +39,7 @@ init =
         initialModel =
             { playlistArea = PlaylistArea.init []
             , songPlayer = SongPlayer.init "http://null.example.com"
+            , playing = False
             }
     in
         ( initialModel, Effects.none)
@@ -54,6 +59,19 @@ update action model =
                 in
                     { model | playlistArea <- playlistArea' }
 
+            Play ->
+                { model | playing <- True }
+
+            Skip ->
+                let
+                    playlistArea' =
+                        PlaylistArea.cycleActivePlaylist model.playlistArea
+                in
+                    { model | playlistArea <- playlistArea' }
+
+            Stop ->
+                { model | playing <- False }
+
             otherwise ->
                 -- TODO akeeton: Remove
                 Debug.crash "Main.Action case not implemented in Main.update"
@@ -71,6 +89,9 @@ view address model =
             [ id "site" ]
             [ h1 [] [ text "Song Player" ]
             , songPlayerHtml
+            , button [ onClick address Play ] [ text "Play" ]
+            , button [ onClick address Skip ] [ text "Skip" ]
+            , button [ onClick address Stop ] [ text "Stop" ]
             , hr [] []
             , playlistAreaHtml
             ]

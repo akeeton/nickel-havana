@@ -6,6 +6,8 @@ module Playlist
     , view
     , name
     , length
+    , getActiveSong
+    , cycle
     )
     where
 
@@ -129,4 +131,22 @@ decoder =
         (\name songs -> { name = name, songs = songs })
         ("name" := JD.string)
         ("songs" := JD.list Song.decoder)
+
+
+getActiveSong : Playlist -> Maybe Song
+getActiveSong playlist =
+    List.head playlist.songs
+
+
+{-| Moves the first song to the end of playlist -}
+cycle : Playlist -> Playlist
+cycle playlist =
+    let
+        maybeSongs' =
+            MyList.move 0 (List.length playlist.songs - 1) playlist.songs
+
+        songs' = Maybe.withDefault [] maybeSongs'
+    in
+        { playlist | songs <- songs' }
+
 
