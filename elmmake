@@ -1,2 +1,2 @@
 #!/bin/bash
-elm make src/Main.elm --warn --output index.html
+elm make src/Main.elm --warn --output build/index.html
