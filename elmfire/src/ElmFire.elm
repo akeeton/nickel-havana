@@ -1,13 +1,10 @@
 module ElmFire
-  ( Error, ErrorType (..), AuthErrorType (..)
-  , Location
+  ( Location
   , fromUrl, sub, parent, root, push
   , Reference
   , open, key, toUrl, location
   , Priority (..)
   , set, setWithPriority, setPriority, update, remove
-  , onDisconnectSet, onDisconnectSetWithPriority
-  , onDisconnectUpdate, onDisconnectRemove, onDisconnectCancel
   , Snapshot
   , Action (..)
   , transaction
@@ -17,22 +14,25 @@ module ElmFire
   , subscribe, unsubscribe, once
   , valueChanged, childAdded, childChanged, childRemoved, childMoved
   , orderByChild, orderByValue, orderByKey, orderByPriority
-  , startAtValue, startAtKey, startAtPriority
-  , endAtValue, endAtKey, endAtPriority
+  , startAtValue, endAtValue, startAtKey, endAtKey, startAtPriority, endAtPriority
   , limitToFirst, limitToLast
   , toSnapshotList, toValueList, toKeyList,toPairList
   , exportValue
   , goOffline, goOnline
-  , subscribeConnected, subscribeServerTimeOffset
-  , serverTimeStamp
+  , subscribeConnected
+  , onDisconnectSet, onDisconnectSetWithPriority
+  , onDisconnectUpdate, onDisconnectRemove, onDisconnectCancel
+  , serverTimeStamp, subscribeServerTimeOffset
+  , Error, ErrorType (..), AuthErrorType (..)
   ) where
 
-{-| Elm bindings to Firebase.
 
-# Firebase locations
+{-| Elm Bindings to Firebase.
+
+# Firebase Locations
 @docs Location, fromUrl, sub, parent, root, push
 
-# Firebase references
+# Firebase References
 @docs Reference, open, key, toUrl, location
 
 # Priorities
@@ -49,27 +49,33 @@ module ElmFire
 
 # Querying
 @docs Query, Subscription, Cancellation,
-subscribe, unsubscribe, once,
-valueChanged, childAdded, childChanged, childRemoved, childMoved
+  subscribe, unsubscribe, once,
+  valueChanged, childAdded, childChanged, childRemoved, childMoved
 
 # Ordering
 @docs orderByChild, orderByValue, orderByKey, orderByPriority
 
 # Filtering
-@docs startAtValue, startAtKey, startAtPriority, endAtValue, endAtKey, endAtPriority
+@docs startAtValue, endAtValue, startAtKey, endAtKey, startAtPriority, endAtPriority
 
 # Limiting
 @docs limitToFirst, limitToLast
 
-# Snapshort processing
-@docs toSnapshotList, toValueList, toKeyList, toPairList, export
+# Snapshot Processing
+@docs toSnapshotList, toValueList, toKeyList, toPairList, exportValue
 
 # Connection State and Offline Capabilities
-@doc goOffline, goOnline, subscribeConnected, subscribeServerTimeOffset
+@docs goOffline, goOnline, subscribeConnected,
+  onDisconnectSet, onDisconnectSetWithPriority,
+  onDisconnectUpdate, onDisconnectRemove, onDisconnectCancel
 
-# Error reporting
+# Server Time
+@docs serverTimeStamp, subscribeServerTimeOffset
+
+# Error Reporting
 @docs Error, ErrorType, AuthErrorType
 -}
+
 
 import Native.Firebase
 import Native.ElmFire
@@ -77,6 +83,7 @@ import Time exposing (Time)
 import Json.Encode as JE
 import Json.Decode as JD
 import Task exposing (Task)
+
 
 {-| Errors reported from Firebase or ElmFire -}
 type alias Error =
@@ -140,7 +147,7 @@ References are returned from many Firebase tasks as well as in query results.
 -}
 type Reference = Reference
 
-{- Each existing location in a Firebase may be attributed with a priority,
+{-| Each existing location in a Firebase may be attributed with a priority,
 which can be a number or a string.
 
 Priorities can be used for filtering and sorting entries in a query.
@@ -377,7 +384,7 @@ subscribe : (Snapshot -> Task x a)
 subscribe createResponseTask =
   subscribeConditional (Just << createResponseTask)
 
-{-| Query a Firebase location by subscription with optional reaction
+{- Query a Firebase location by subscription with optional reaction
 
 Similar to `subscribe` except that the function given as the first parameter
 can decide whether to run a task or not.
@@ -422,19 +429,33 @@ emptyOptions =
 type QueryEvent =
   ValueChanged | ChildAdded | ChildChanged | ChildRemoved | ChildMoved
 
+type alias SimpleQuery =
+  { tag : QueryOptions
+  , queryEvent : QueryEvent
+  , noOrder : Bool
+  , noLimit : Bool
+  , noStart : Bool
+  , noEnd : Bool
+  }
+
 {-| Query value changes at the referenced location -}
+valueChanged : SimpleQuery
 valueChanged = { emptyOptions | queryEvent = ValueChanged }
 
 {-| Query child added -}
+childAdded : SimpleQuery
 childAdded   = { emptyOptions | queryEvent = ChildAdded }
 
 {-| Query child changed -}
+childChanged : SimpleQuery
 childChanged = { emptyOptions | queryEvent = ChildChanged }
 
 {-| Query child removed -}
+childRemoved : SimpleQuery
 childRemoved = { emptyOptions | queryEvent = ChildRemoved }
 
 {-| Query child moved -}
+childMoved : SimpleQuery
 childMoved   = { emptyOptions | queryEvent = ChildMoved }
 
 {-| Order query results by the value of a named child -}
@@ -575,9 +596,13 @@ making it suitable for backing up your data.
 exportValue : Snapshot -> JE.Value
 exportValue = Native.ElmFire.exportValue
 
+{-| Manually disconnect the client from the server
+and disables automatic reconnection. -}
 goOffline : Task x ()
 goOffline = Native.ElmFire.setOffline True
 
+{-| Manually reestablish a connection to the server
+and enables automatic reconnection. -}
 goOnline  : Task x ()
 goOnline = Native.ElmFire.setOffline False
 
@@ -609,5 +634,7 @@ subscribeServerTimeOffset createResponseTask location =
     valueChanged
     (location |> root |> sub ".info/serverTimeOffset")
 
+{-| A placeholder value for auto-populating the current timestamp
+(time since the Unix epoch, in milliseconds) by the Firebase servers -}
 serverTimeStamp : JE.Value
 serverTimeStamp = Native.ElmFire.serverTimeStamp

@@ -12,9 +12,9 @@ Nearly all features of the Firebase Web API are exposed in this library:
 - User management
 - Offline capabilities
 
-## Installation
+## Setup
 
-This package is not yet available from the official package catalog, so `elm-package` will not find it.
+This package is not yet available from the official package catalog, so `elm package` will not find it.
 In the meantime please clone the repo directly from github:
 
 ```sh
@@ -301,7 +301,7 @@ subscribeAuth
 - Handling latency:
   `subscribeServerTimeOffset`, `serverTimeStamp`
 
-## Example.elm
+## Examples
 
 There is a very basic example app in `example/src/Example.elm`. To build it:
 
@@ -316,6 +316,12 @@ Alternatively without using `make`:
 cd example
 elm make --output Example.html src/Example.elm
 ```
+
+### TodoMVC
+
+A more complete example is
+[this implementation of TodoMVC](https://github.com/ThomasWeiser/todomvc-elmfire)
+as a collaborative real-time app. 
 
 ## Testing
 
