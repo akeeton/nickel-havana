@@ -2,7 +2,6 @@ module Main where
 
 import Debug -- TODO akeeton: Remove
 import ElmFire as Fire
-import ElmFire.Auth as Auth
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
 import Html.Events exposing (onClick, on, targetValue)
@@ -229,16 +228,28 @@ fireOnWaitlistChange snapshot =
     send actions.address <| WaitlistChanged snapshot.value
 
 
-port fireSubscriber : Task Fire.Error Fire.Subscription
+logError : x -> Task x ()
+logError error =
+    send actions.address <| ErrorHappened (toString error)
+
+
+port fireSubscriber : Task x ()
 port fireSubscriber =
     let
         location = Fire.sub "waitlist" <| Fire.fromUrl fireUrl
+
+        subscriber : Task Fire.Error Fire.Subscription
+        subscriber =
+            Fire.subscribe
+                fireOnWaitlistChange
+                (always <| Task.succeed ()) -- TODO akeeton: Use a callback
+                Fire.valueChanged
+                location
+
+        -- subscriberAndErrorLogger : Task x ()
+        subscriberAndErrorLogger = Task.onError subscriber logError
     in
-    Fire.subscribe
-        fireOnWaitlistChange
-        (always <| Task.succeed ()) -- TODO akeeton: Use a callback
-        Fire.valueChanged
-        location
+        subscriberAndErrorLogger
 
 
 main : Signal Html
