@@ -6,9 +6,9 @@ import ElmFire.Auth as Auth
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
 import Html.Events exposing (onClick, on, targetValue)
+import Json.Decode as JD
 import Json.Encode as JE
-import Signal exposing (Address, message, send)
-import StartApp exposing (App, start)
+import Signal exposing (Address, Mailbox, mailbox, message, send)
 import Task exposing (Task)
 
 -- import Playlist exposing (Playlist)
@@ -22,6 +22,7 @@ type alias Model =
     , playing : Bool
     , username : String
     , enteredUsername : Bool
+    , waitlist : Waitlist
     }
 
 
@@ -34,6 +35,7 @@ type Action
     | Stop
     | UpdateUsername String
     | EnterUsername
+    | WaitlistChanged JE.Value
 
 
 init : Model
@@ -46,6 +48,7 @@ init =
             , playing = False
             , username = ""
             , enteredUsername = False
+            , waitlist = []
             }
     in
         initialModel
@@ -91,6 +94,9 @@ update action model =
             EnterUsername ->
                 { model | enteredUsername <- True }
 
+            WaitlistChanged jsonWaitlist ->
+                { model | waitlist <- decodeWaitlist jsonWaitlist }
+
             otherwise ->
                 -- TODO akeeton: Remove
                 Debug.crash "Main.Action case not implemented in Main.update"
@@ -112,10 +118,14 @@ viewNormal address model =
     let
         songPlayerHtml = songPlayerToHtml address model.songPlayer
         playlistAreaHtml = playlistAreaToHtml address model.playlistArea
+        waitlistHtml = div [] <| List.map (\x -> p [] [ text x ]) model.waitlist
     in
         div
             [ id "site" ]
-            [ h1 [] [ text "Song Player" ]
+            [ h1 [] [ text "Waitlist" ]
+            , waitlistHtml
+            , hr [] []
+            , h1 [] [ text "Song Player" ]
             , songPlayerHtml
             , button [ onClick address Play ] [ text "Play" ]
             , button [ onClick address Skip ] [ text "Skip" ]
@@ -176,6 +186,43 @@ loadActiveSongIntoSongPlayer model =
 
         Nothing ->
             model
+
+
+type alias Waitlist = List String
+
+
+decodeWaitlist : JE.Value -> Waitlist
+decodeWaitlist jsonWaitlist =
+    let
+        waitlistDecoder = JD.list JD.string
+    in
+        case JD.decodeValue waitlistDecoder jsonWaitlist of
+            Ok waitlist ->
+                waitlist
+
+            Err _ ->
+                []
+
+
+fireUrl : String
+fireUrl = "https://brilliant-inferno-5135.firebaseio.com"
+
+
+fireOnWaitlistChange : Fire.Snapshot -> Task x ()
+fireOnWaitlistChange snapshot =
+    send actions.address <| WaitlistChanged snapshot.value
+
+
+port fireSubscriber : Task Fire.Error Fire.Subscription
+port fireSubscriber =
+    let
+        location = Fire.sub "waitlist" <| Fire.fromUrl fireUrl
+    in
+    Fire.subscribe
+        fireOnWaitlistChange
+        (always <| Task.succeed ()) -- TODO akeeton: Use a callback
+        Fire.valueChanged
+        location
 
 
 main : Signal Html
