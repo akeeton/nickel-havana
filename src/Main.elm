@@ -1,13 +1,13 @@
 module Main where
 
 import Debug -- TODO akeeton: Remove
-import Effects exposing (Effects, Never)
---import ElmFire exposing (..)
---import ElmFire.Auth as Auth
+import ElmFire as Fire
+import ElmFire.Auth as Auth
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
 import Html.Events exposing (onClick, on, targetValue)
-import Signal exposing (Address, message)
+import Json.Encode as JE
+import Signal exposing (Address, message, send)
 import StartApp exposing (App, start)
 import Task exposing (Task)
 
@@ -36,7 +36,7 @@ type Action
     | EnterUsername
 
 
-init : (Model, Effects Action)
+init : Model
 init =
     let
         initialModel : Model
@@ -48,10 +48,10 @@ init =
             , enteredUsername = False
             }
     in
-        ( initialModel, Effects.none)
+        initialModel
 
 
-update : Action -> Model -> (Model, Effects Action)
+update : Action -> Model -> Model
 update action model =
     let
         model' = case action of
@@ -95,7 +95,7 @@ update action model =
                 -- TODO akeeton: Remove
                 Debug.crash "Main.Action case not implemented in Main.update"
     in
-        (model', Effects.none)
+        model'
 
 
 -- TODO akeeton: Refactor
@@ -145,6 +145,7 @@ viewAskForName address model =
                     [ on "input" targetValue (\x -> message address <| UpdateUsername x) ]
                     []
                 , button
+                    -- TODO akeeton: Make the enter key activate the button
                     [ onClick address buttonAction ]
                     [ text "Enter" ]
                 ]
@@ -177,21 +178,16 @@ loadActiveSongIntoSongPlayer model =
             model
 
 
-inputs : List (Signal Action)
-inputs =
-    []
-
-
-app : App Model
-app =
-    start { init = init, view = view, update = update, inputs = inputs }
-
-
 main : Signal Html
 main =
-    app.html
+    Signal.map (view actions.address) model
 
 
-port tasks : Signal (Task Never ())
-port tasks =
-    app.tasks
+model : Signal Model
+model =
+    Signal.foldp update init actions.signal
+
+
+actions : Signal.Mailbox (Action)
+actions =
+    Signal.mailbox DoNothing
