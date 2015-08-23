@@ -60,55 +60,52 @@ init =
 
 update : Action -> Model -> Model
 update action model =
-    let
-        model' = case action of
-            DoNothing ->
+    case action of
+        DoNothing ->
+            model
+
+        ErrorHappened error ->
+            { model | errors <- error::model.errors }
+
+        PlaylistAreaAction playlistAreaAction ->
+            let
+                playlistArea' =
+                    PlaylistArea.update playlistAreaAction model.playlistArea
+            in
+                { model | playlistArea <- playlistArea' }
+
+        Play ->
+            if model.playing then
                 model
+            else
+                loadActiveSongIntoSongPlayer { model | playing <- True }
 
-            ErrorHappened error ->
-                { model | errors <- error::model.errors }
+        Skip ->
+            let
+                playlistArea' =
+                    PlaylistArea.cycleActivePlaylist model.playlistArea
 
-            PlaylistAreaAction playlistAreaAction ->
-                let
-                    playlistArea' =
-                        PlaylistArea.update playlistAreaAction model.playlistArea
-                in
-                    { model | playlistArea <- playlistArea' }
+                model' = { model | playlistArea <- playlistArea' }
+            in
+                loadActiveSongIntoSongPlayer model'
 
-            Play ->
-                if model.playing then
-                    model
-                else
-                    loadActiveSongIntoSongPlayer { model | playing <- True }
+        Stop ->
+            { model |
+                playing <- False,
+                songPlayer <- SongPlayer.init "http://null.example.com" }
 
-            Skip ->
-                let
-                    playlistArea' =
-                        PlaylistArea.cycleActivePlaylist model.playlistArea
+        UpdateUsername username ->
+            { model | username <- username }
 
-                    model' = { model | playlistArea <- playlistArea' }
-                in
-                    loadActiveSongIntoSongPlayer model'
+        EnterUsername ->
+            { model | enteredUsername <- True }
 
-            Stop ->
-                { model |
-                    playing <- False,
-                    songPlayer <- SongPlayer.init "http://null.example.com" }
+        WaitlistChanged jsonWaitlist ->
+            { model | waitlist <- decodeWaitlist jsonWaitlist }
 
-            UpdateUsername username ->
-                { model | username <- username }
-
-            EnterUsername ->
-                { model | enteredUsername <- True }
-
-            WaitlistChanged jsonWaitlist ->
-                { model | waitlist <- decodeWaitlist jsonWaitlist }
-
-            otherwise ->
-                -- TODO akeeton: Remove
-                Debug.crash "Main.Action case not implemented in Main.update"
-    in
-        model'
+        otherwise ->
+            -- TODO akeeton: Remove
+            Debug.crash "Main.Action case not implemented in Main.update"
 
 
 -- TODO akeeton: Refactor
