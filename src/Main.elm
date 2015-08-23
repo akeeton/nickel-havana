@@ -9,6 +9,7 @@ import Html.Events exposing (onClick, on, targetValue)
 import Json.Decode as JD
 import Json.Encode as JE
 import Signal exposing (Address, Mailbox, mailbox, message, send)
+import String
 import Task exposing (Task)
 
 -- import Playlist exposing (Playlist)
@@ -17,7 +18,8 @@ import SongPlayer exposing (SongPlayer)
 
 
 type alias Model =
-    { playlistArea : PlaylistArea
+    { errors : List String
+    , playlistArea : PlaylistArea
     , songPlayer : SongPlayer
     , playing : Bool
     , username : String
@@ -28,6 +30,7 @@ type alias Model =
 
 type Action
     = DoNothing
+    | ErrorHappened String
     | PlaylistAreaAction PlaylistArea.Action
     | SongPlayerAction SongPlayer.Action
     | Play
@@ -43,7 +46,8 @@ init =
     let
         initialModel : Model
         initialModel =
-            { playlistArea = PlaylistArea.init []
+            { errors = []
+            , playlistArea = PlaylistArea.init []
             , songPlayer = SongPlayer.init "http://null.example.com"
             , playing = False
             , username = ""
@@ -60,6 +64,9 @@ update action model =
         model' = case action of
             DoNothing ->
                 model
+
+            ErrorHappened error ->
+                { model | errors <- error::model.errors }
 
             PlaylistAreaAction playlistAreaAction ->
                 let
@@ -107,10 +114,22 @@ update action model =
 -- TODO akeeton: Refactor
 view : Address Action -> Model -> Html
 view address model =
-    if model.enteredUsername then
-        viewNormal address model
-    else
-        viewAskForName address model
+    let
+        viewHtml =
+            if model.enteredUsername then
+                viewNormal address model
+            else
+                viewAskForName address model
+
+        errorsHtml = textarea [] [ text <| String.join "\n" model.errors ]
+    in
+        div
+            []
+            [ viewHtml
+            , hr [] []
+            , h1 [] [ text "Errors" ]
+            , errorsHtml
+            ]
 
 
 viewNormal : Address Action -> Model -> Html
