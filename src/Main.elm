@@ -7,7 +7,7 @@ import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (id, type', width, height, src, style)
 import Html.Events exposing (onClick, on, targetValue)
-import Signal exposing (Address)
+import Signal exposing (Address, message)
 import StartApp exposing (App, start)
 import Task exposing (Task)
 
@@ -20,6 +20,8 @@ type alias Model =
     { playlistArea : PlaylistArea
     , songPlayer : SongPlayer
     , playing : Bool
+    , username : String
+    , enteredUsername : Bool
     }
 
 
@@ -30,6 +32,8 @@ type Action
     | Play
     | Skip
     | Stop
+    | UpdateUsername String
+    | EnterUsername
 
 
 init : (Model, Effects Action)
@@ -40,6 +44,8 @@ init =
             { playlistArea = PlaylistArea.init []
             , songPlayer = SongPlayer.init "http://null.example.com"
             , playing = False
+            , username = ""
+            , enteredUsername = False
             }
     in
         ( initialModel, Effects.none)
@@ -79,6 +85,12 @@ update action model =
                     playing <- False,
                     songPlayer <- SongPlayer.init "http://null.example.com" }
 
+            UpdateUsername username ->
+                { model | username <- username }
+
+            EnterUsername ->
+                { model | enteredUsername <- True }
+
             otherwise ->
                 -- TODO akeeton: Remove
                 Debug.crash "Main.Action case not implemented in Main.update"
@@ -86,8 +98,17 @@ update action model =
         (model', Effects.none)
 
 
+-- TODO akeeton: Refactor
 view : Address Action -> Model -> Html
 view address model =
+    if model.enteredUsername then
+        viewNormal address model
+    else
+        viewAskForName address model
+
+
+viewNormal : Address Action -> Model -> Html
+viewNormal address model =
     let
         songPlayerHtml = songPlayerToHtml address model.songPlayer
         playlistAreaHtml = playlistAreaToHtml address model.playlistArea
@@ -104,15 +125,30 @@ view address model =
             ]
 
 
-countStyle : Attribute
-countStyle =
-    style
-        [ ("font-size", "20px")
-        , ("font-family", "monospace")
-        , ("display", "inline-block")
-        , ("width", "50px")
-        , ("text-align", "center")
-        ]
+-- TODO akeeton: Refactor
+viewAskForName : Address Action -> Model -> Html
+viewAskForName address model =
+    let
+        buttonAction =
+            if model.username == "" then
+                DoNothing
+            else
+                EnterUsername
+    in
+        div
+            []
+            [ h1 [] [ text "Enter a name" ]
+            , label
+                []
+                [ text "Username: "
+                , input
+                    [ on "input" targetValue (\x -> message address <| UpdateUsername x) ]
+                    []
+                , button
+                    [ onClick address buttonAction ]
+                    [ text "Enter" ]
+                ]
+            ]
 
 
 playlistAreaToHtml : Address Action -> PlaylistArea -> Html
